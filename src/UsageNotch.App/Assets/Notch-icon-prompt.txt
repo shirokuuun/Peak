@@ -1,0 +1,10 @@
+Generated using the built-in image_gen tool with a transparent background.
+
+Use case: logo-brand
+Asset type: Windows application icon for Usage Notch, a small black Dynamic-Island-style desktop overlay that displays AI subscription usage.
+Primary request: Create one polished, distinctive app icon that remains recognizable at 16 and 32 pixels.
+Subject: A nearly black charcoal rounded-square tile. At its center, a large ivory horizontal rounded capsule representing the notch. Inside the capsule, one bold charcoal circular progress gauge with a clearly open wedge on the left, and one short thick charcoal horizontal dash on the right. The capsule is the dominant mark.
+Style/medium: Minimal premium desktop app icon, clean geometric silhouettes, subtle tile edge shading, flat front-facing view. Match the actual app's black panels and white usage accents.
+Composition: One centered icon only, square canvas, the rounded tile fills approximately 88 percent of the canvas. Balanced proportions, thick legible shapes, generous separation between the gauge and dash.
+Background: Genuine transparent alpha outside the rounded tile.
+Constraints: No letters, no words, no numbers, no brand logos, no watermark, no mockup scene, no extra UI, no checkerboard baked into the image, no shadow extending outside the tile. Keep the artwork very simple and crisp.

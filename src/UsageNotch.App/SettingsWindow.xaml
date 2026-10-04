@@ -1,0 +1,147 @@
+<Window x:Class="UsageNotch.App.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="Peak settings" Icon="Assets/Notch.ico" Width="880" Height="720" MinWidth="800" MinHeight="610"
+        WindowStartupLocation="CenterOwner" WindowStyle="None" ResizeMode="CanResize" Background="Transparent" Foreground="{DynamicResource TextBrush}">
+    <shell:WindowChrome.WindowChrome><shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0"/></shell:WindowChrome.WindowChrome>
+    <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="SettingsStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="#343434" BorderThickness="1" CornerRadius="16">
+        <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="68"/><RowDefinition/><RowDefinition Height="70"/></Grid.RowDefinitions>
+            <Grid Margin="24,12" Background="Transparent" MouseLeftButtonDown="OnDragWindow">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="180"/><ColumnDefinition/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Image Source="Assets/Notch.ico" Width="23" Height="23" Margin="0,0,10,0"/><TextBlock Text="Peak settings" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/></StackPanel>
+                <Button Grid.Column="1" HorizontalAlignment="Center" Background="Transparent" Padding="0" Click="OnPeek" ToolTip="Show the live notch" AutomationProperties.Name="Preview live notch">
+                    <Border x:Name="MiniNotch" Width="220" Height="36" CornerRadius="18" BorderThickness="1">
+                        <Grid Margin="12,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <TextBlock x:Name="MiniCodex" Text="{Binding CodexRemainingText, FallbackValue=—}" VerticalAlignment="Center" FontSize="11"/>
+                            <TextBlock x:Name="MiniTitle" Grid.Column="1" Text="Peak" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="MiniClaude" Grid.Column="2" Text="{Binding ClaudeRemainingText, FallbackValue=—}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11"/>
+                        </Grid>
+                    </Border>
+                </Button>
+                <Button Grid.Column="2" Content="×" FontSize="22" Padding="8,2" Background="Transparent" Click="OnCancel" ToolTip="Close without saving" AutomationProperties.Name="Close settings"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="188"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid Margin="16,10,12,22">
+                    <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <StackPanel>
+                        <RadioButton x:Name="NavPresence" Content="Presence" Tag="Presence" GroupName="Navigation" Style="{StaticResource Navigation}" IsChecked="True" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavOutOfWay" Content="Out of the way" Tag="OutOfWay" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavAppearance" Content="Appearance" Tag="Appearance" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavProviders" Content="Providers" Tag="Providers" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavAlerts" Content="Alerts" Tag="Alerts" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavShortcuts" Content="Shortcuts" Tag="Shortcuts" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                        <RadioButton x:Name="NavSystem" Content="System" Tag="System" GroupName="Navigation" Style="{StaticResource Navigation}" Checked="OnSectionChanged"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Margin="12,0"><TextBlock Text="Peak for Windows" Foreground="{StaticResource MutedBrush}" FontSize="11"/><TextBlock Text="Local to your computer" Foreground="{StaticResource MutedBrush}" FontSize="10" Margin="0,4,0,0"/></StackPanel>
+                </Grid>
+                <ScrollViewer x:Name="SectionScroll" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0" Margin="18,6,20,8">
+                    <StackPanel Margin="0,0,6,10">
+                        <TextBlock x:Name="SectionTitle" Text="Presence" FontSize="25" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="SectionDescription" Style="{StaticResource Description}" Text="Choose when Peak is on screen, and how it gets your attention." Margin="0,0,0,22"/>
+                        <StackPanel x:Name="PresencePage">
+                            <Border Style="{StaticResource Card}"><StackPanel>
+                                <TextBlock Text="Show the notch" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="Keep your limits a glance away, show confirmed work, or reveal Peak only when you hover over its spot." Style="{StaticResource Description}"/>
+                                <Border Background="#303030" CornerRadius="11" Padding="4" HorizontalAlignment="Left" Margin="0,13,0,0"><StackPanel x:Name="PresenceChoices" Orientation="Horizontal">
+                                    <RadioButton Content="Always" Tag="Always" GroupName="Presence" Style="{StaticResource Segment}"/>
+                                    <RadioButton Content="When active" Tag="Active" GroupName="Presence" Style="{StaticResource Segment}"/>
+                                    <RadioButton Content="On hover" Tag="Hover" GroupName="Presence" Style="{StaticResource Segment}"/>
+                                </StackPanel></Border>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel>
+                                <TextBlock Text="When an agent needs you" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="A reported review request or question can bring Peak back when it would otherwise be hidden. Open Codex to respond." Style="{StaticResource Description}"/>
+                                <Border Background="#303030" CornerRadius="11" Padding="4" HorizontalAlignment="Left" Margin="0,13,0,0"><StackPanel x:Name="AttentionChoices" Orientation="Horizontal">
+                                    <RadioButton Content="Until cleared" Tag="UntilCleared" GroupName="Attention" Style="{StaticResource Segment}" Checked="OnBehaviorChoice"/>
+                                    <RadioButton Content="For a while" Tag="Brief" GroupName="Attention" Style="{StaticResource Segment}" Checked="OnBehaviorChoice"/>
+                                    <RadioButton Content="Remind me" Tag="Remind" GroupName="Attention" Style="{StaticResource Segment}" Checked="OnBehaviorChoice"/>
+                                </StackPanel></Border>
+                                <Grid x:Name="AttentionTiming" Margin="0,12,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="70"/></Grid.ColumnDefinitions>
+                                    <Slider x:Name="AttentionDuration" Minimum="10" Maximum="300" TickFrequency="10" IsSnapToTickEnabled="True" AutomationProperties.Name="Initial review visibility in seconds"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding ElementName=AttentionDuration, Path=Value, StringFormat={}{0:0} seconds}" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <TextBlock x:Name="AttentionHint" Style="{StaticResource Description}"/>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel>
+                                <TextBlock Text="In full-screen apps" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="Choose what appears over games, videos, and presentations. The reveal shortcut still works whenever you need Peak." Style="{StaticResource Description}"/>
+                                <Border Background="#303030" CornerRadius="11" Padding="4" HorizontalAlignment="Left" Margin="0,13,0,0"><StackPanel x:Name="FullscreenChoices" Orientation="Horizontal">
+                                    <RadioButton Content="Alerts only" Tag="Alerts" GroupName="Fullscreen" Style="{StaticResource Segment}"/>
+                                    <RadioButton Content="Stay hidden" Tag="Hidden" GroupName="Fullscreen" Style="{StaticResource Segment}"/>
+                                    <RadioButton Content="Stay visible" Tag="Visible" GroupName="Fullscreen" Style="{StaticResource Segment}"/>
+                                </StackPanel></Border>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,18,0"><TextBlock Text="Hide the notch from screen sharing" Style="{StaticResource CardTitle}"/><TextBlock Text="Keep Peak on your screen while supported Windows capture tools leave it out. Recording apps may handle this differently." Style="{StaticResource Description}"/></StackPanel>
+                                <CheckBox x:Name="HideFromCapture" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Hide notch from screen sharing and recordings"/>
+                            </Grid></Border>
+                        </StackPanel>
+                        <StackPanel x:Name="OutOfWayPage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><StackPanel>
+                                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Step aside under the pointer" Style="{StaticResource CardTitle}"/><TextBlock Text="Fade the notch when you reach for something underneath it. Clicks pass through while it steps aside." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="FadeUnderPointer" Grid.Column="1" HorizontalAlignment="Right" Checked="OnBehaviorChoice" Unchecked="OnBehaviorChoice" AutomationProperties.Name="Fade Peak under the pointer"/></Grid>
+                                <Grid Margin="0,16,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="55"/></Grid.ColumnDefinitions><Slider x:Name="PointerOpacity" Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" AutomationProperties.Name="Opacity under pointer"/><TextBlock Grid.Column="1" Text="{Binding ElementName=PointerOpacity, Path=Value, StringFormat={}{0:0}%}" FontSize="12" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid>
+                                <TextBlock Text="0% makes Peak disappear; 100% keeps it fully visible. Move away to bring it back. On hover mode stays interactive." Style="{StaticResource Description}"/>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,15,0"><TextBlock Text="Fade speed" Style="{StaticResource CardTitle}"/><TextBlock Text="How quickly Peak steps aside and returns." Style="{StaticResource Description}"/></StackPanel>
+                                <Border Grid.Column="1" Background="#303030" CornerRadius="11" Padding="4" VerticalAlignment="Center"><StackPanel x:Name="FadeChoices" Orientation="Horizontal"><RadioButton Content="Instant" Tag="Instant" GroupName="Fade" Style="{StaticResource Segment}"/><RadioButton Content="Quick" Tag="Quick" GroupName="Fade" Style="{StaticResource Segment}"/><RadioButton Content="Soft" Tag="Soft" GroupName="Fade" Style="{StaticResource Segment}"/></StackPanel></Border>
+                            </Grid></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,18,0"><TextBlock Text="Expand on hover" Style="{StaticResource CardTitle}"/><TextBlock Text="See limits and tasks when your pointer rests on Peak. Pinned details remain open." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="ExpandOnHover" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Expand Peak on hover"/>
+                            </Grid></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,18,0"><TextBlock Text="Always let clicks through" Style="{StaticResource CardTitle}"/><TextBlock Text="Keep the notch visible without blocking other apps. Hold Alt while hovering to interact, or use the reveal shortcut." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="ClickThrough" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Always pass clicks through Peak"/>
+                            </Grid></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="A quick look, whenever you need it" Style="{StaticResource CardTitle}"/><TextBlock Text="Hold Alt while hovering to reveal and use a faded notch. Review requests and pinned details stay readable instead of fading." Style="{StaticResource Description}"/></StackPanel></Border>
+                        </StackPanel>
+                        <StackPanel x:Name="AppearancePage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Notch color" Style="{StaticResource CardTitle}"/><TextBlock Text="Choose your own color or follow the light, dark, or system theme. Text and status colors adjust for readability." Style="{StaticResource Description}"/>
+                                <Grid Margin="0,14,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition/></Grid.ColumnDefinitions><ComboBox x:Name="Theme" SelectionChanged="OnThemeChanged" AutomationProperties.Name="Notch theme"/><Button Grid.Column="2" Click="OnChooseColor" AutomationProperties.Name="Choose notch color"><StackPanel Orientation="Horizontal"><Border x:Name="ColorSwatch" Width="18" Height="18" CornerRadius="5" BorderBrush="#888888" BorderThickness="1" Margin="0,0,9,0"/><TextBlock Text="Choose color…"/></StackPanel></Button></Grid>
+                                <TextBlock x:Name="ColorDescription" Style="{StaticResource Description}" Margin="0,12,0,0"/>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Display" Style="{StaticResource CardTitle}"/><TextBlock Text="Choose the monitor where Peak lives. If it is disconnected, Peak returns to your primary screen." Style="{StaticResource Description}"/><ComboBox x:Name="Monitor" Margin="0,14,0,0" AutomationProperties.Name="Peak monitor"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Gap from the top" Style="{StaticResource CardTitle}"/><TextBlock Text="Leave room for tabs or a top taskbar. The gap stays fixed as Peak expands downward." Style="{StaticResource Description}"/><Grid Margin="0,14,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="65"/></Grid.ColumnDefinitions><Slider x:Name="TopOffset" Minimum="0" Maximum="200" TickFrequency="1" IsSnapToTickEnabled="True" AutomationProperties.Name="Gap from top in pixels"/><TextBlock Grid.Column="1" Text="{Binding ElementName=TopOffset, Path=Value, StringFormat={}{0:0} px}" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" HorizontalAlignment="Right"/></Grid></StackPanel></Border>
+                        </StackPanel>
+                        <StackPanel x:Name="ProvidersPage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><StackPanel>
+                                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Codex usage" Style="{StaticResource CardTitle}"/><TextBlock Text="Read your subscription limits from the Codex CLI's secure Windows login." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="CodexEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Enable Codex usage"/></Grid>
+                                <Grid Margin="0,18,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Codex task activity" Style="{StaticResource CardTitle}"/><TextBlock Text="Show chats, current work, and reported review requests." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="CodexTasksEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Enable Codex task activity"/></Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,16,0,0"><Button x:Name="ConnectTasks" Content="Connect task activity" Click="OnConnectTasks" Margin="0,0,8,0"/><Button x:Name="DisconnectTasks" Content="Disconnect" Click="OnDisconnectTasks"/></StackPanel>
+                                <TextBlock x:Name="TaskBridgeStatus" Style="{StaticResource Description}" Margin="0,12,0,0"/>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Claude usage" Style="{StaticResource CardTitle}"/><TextBlock Text="Show limits for your personal Claude Code subscription." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="ClaudeEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Enable Claude usage"/></Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,16,0,0"><Button x:Name="ConnectClaude" Content="Connect Claude" Click="OnConnectClaude" Margin="0,0,8,0"/><Button x:Name="DisconnectClaude" Content="Disconnect" Click="OnDisconnectClaude"/></StackPanel><TextBlock x:Name="BridgeStatus" Style="{StaticResource Description}" Margin="0,12,0,0"/>
+                            </StackPanel></Border>
+                            <TextBlock Text="Connection buttons apply immediately. Cancel only discards the other preferences." Style="{StaticResource Description}" Margin="6,2,6,0"/>
+                        </StackPanel>
+                        <StackPanel x:Name="AlertsPage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Usage alerts" Style="{StaticResource CardTitle}"/><TextBlock Text="Notify when a provider crosses your warning or critical threshold." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="NotificationsEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Enable usage threshold notifications"/></Grid>
+                                <Grid Margin="0,17,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="Warning · percent used" Style="{StaticResource Description}"/><TextBox x:Name="WarningThreshold" Margin="0,8,0,0" AutomationProperties.Name="Warning usage threshold"/></StackPanel><StackPanel Grid.Column="2"><TextBlock Text="Critical · percent used" Style="{StaticResource Description}"/><TextBox x:Name="CriticalThreshold" Margin="0,8,0,0" AutomationProperties.Name="Critical usage threshold"/></StackPanel></Grid><TextBlock Text="The notch shows remaining usage. These thresholds measure usage consumed." Style="{StaticResource Description}" Margin="0,12,0,0"/>
+                            </StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Confirmed resets" Style="{StaticResource CardTitle}"/><TextBlock Text="Notify when your provider confirms that usage has reset." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="ResetNotificationsEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Enable confirmed reset notifications"/></Grid></Border>
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Codex review requests" Style="{StaticResource CardTitle}"/><TextBlock Text="Send a desktop notification when Codex asks for your review. Requires connected task activity." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="TaskNotificationsEnabled" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Notify when Codex requests review"/></Grid></Border>
+                        </StackPanel>
+                        <StackPanel x:Name="ShortcutsPage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Reveal Peak" Style="{StaticResource CardTitle}"/><TextBlock Text="Bring back a hidden or faded notch and pin its details. Works while clicks pass through and over full-screen apps." Style="{StaticResource Description}"/><ComboBox x:Name="RecoveryShortcut" Margin="0,14,0,0" AutomationProperties.Name="Reveal Peak keyboard shortcut"/><TextBlock x:Name="ShortcutStatus" Style="{StaticResource Description}" Margin="0,12,0,0"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Alt + hover" Style="{StaticResource CardTitle}"/><TextBlock Text="Hold Alt while your pointer is over Peak to temporarily interact with it. Let go to return to your usual behavior." Style="{StaticResource Description}"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Escape" Style="{StaticResource CardTitle}"/><TextBlock Text="Collapse pinned details. In settings, Escape cancels unsaved changes." Style="{StaticResource Description}"/></StackPanel></Border>
+                        </StackPanel>
+                        <StackPanel x:Name="SystemPage" Visibility="Collapsed">
+                            <Border Style="{StaticResource Card}"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="56"/></Grid.ColumnDefinitions><StackPanel Margin="0,0,18,0"><TextBlock Text="Launch at sign-in" Style="{StaticResource CardTitle}"/><TextBlock Text="Start Peak in the tray when you sign in to Windows." Style="{StaticResource Description}"/></StackPanel><CheckBox x:Name="LaunchOnStartup" Grid.Column="1" HorizontalAlignment="Right" AutomationProperties.Name="Launch Peak when signing in"/></Grid></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Refresh interval" Style="{StaticResource CardTitle}"/><TextBlock Text="Check provider limits every 30–600 seconds. Task activity updates separately as it arrives." Style="{StaticResource Description}"/><TextBox x:Name="RefreshInterval" Margin="0,14,0,0" Width="120" HorizontalAlignment="Left" AutomationProperties.Name="Refresh interval in seconds"/></StackPanel></Border>
+                            <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="Local by design" Style="{StaticResource CardTitle}"/><TextBlock Text="Peak stores preferences and observations on this computer. It has no remote backend or telemetry. Provider sign-in stays with each provider's own tools." Style="{StaticResource Description}"/></StackPanel></Border>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <Border Grid.Row="2" BorderBrush="#303030" BorderThickness="0,1,0,0" Padding="24,14">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="ValidationMessage" Foreground="{StaticResource CriticalBrush}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="Cancel" Click="OnCancel" IsCancel="True" Margin="0,0,8,0"/><Button Content="Save changes" Click="OnSave" Background="#F0F0EE" Foreground="#161616" IsDefault="True"/></StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

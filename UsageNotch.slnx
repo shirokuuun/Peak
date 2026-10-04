@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/UsageNotch.App/UsageNotch.App.csproj" />
+    <Project Path="src/UsageNotch.ClaudeBridge/UsageNotch.ClaudeBridge.csproj" />
+    <Project Path="src/UsageNotch.Core/UsageNotch.Core.csproj" />
+    <Project Path="src/UsageNotch.Providers/UsageNotch.Providers.csproj" />
+    <Project Path="src/UsageNotch.Windows/UsageNotch.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/UsageNotch.Core.Tests/UsageNotch.Core.Tests.csproj" />
+  </Folder>
+</Solution>
