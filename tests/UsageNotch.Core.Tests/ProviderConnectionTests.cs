@@ -24,7 +24,7 @@ public sealed class ProviderConnectionTests : IDisposable
     [Theory]
     [InlineData("codex")]
     [InlineData("claude")]
-    public void NativeInstallerIsDetectedEvenWhenTheAppsPathIsStale(string name)
+    public void LocalLauncherIsDetectedEvenWhenTheAppsPathIsStale(string name)
     {
         var expected = CreateFile($"profile/.local/bin/{name}.exe");
         Assert.Equal(expected, Find(name));
@@ -36,6 +36,14 @@ public sealed class ProviderConnectionTests : IDisposable
         CreateFile("roaming/npm/codex.cmd");
         var expected = CreateFile("roaming/npm/node_modules/@openai/codex-win32-x64/vendor/x86_64-pc-windows-msvc/codex/codex.exe");
         Assert.Equal(expected, Find("codex", Path.Combine(_root, "roaming/npm")));
+    }
+
+    [Fact]
+    public void CodexOfficialWindowsInstallerIsDetectedBeforeTheBundledDesktopCli()
+    {
+        var expected = CreateFile("local/Programs/OpenAI/Codex/bin/codex.exe");
+        CreateFile("local/OpenAI/Codex/bin/desktop-version/codex.exe");
+        Assert.Equal(expected, Find("codex"));
     }
 
     [Fact]

@@ -23,7 +23,8 @@ internal static class ExecutableLocator
             catch { }
         }
 
-        // Native installers use this location. A running app may still have the old PATH.
+        // Claude's native installer and common local launchers use this location.
+        // A running app may still have the old PATH.
         var launcher = Path.Combine(profile, ".local", "bin", executable + ".exe");
         if (File.Exists(launcher)) return launcher;
 
@@ -38,6 +39,8 @@ internal static class ExecutableLocator
 
         if (executable.Equals("codex", StringComparison.OrdinalIgnoreCase))
         {
+            var standalone = Path.Combine(local, "Programs", "OpenAI", "Codex", "bin", "codex.exe");
+            if (File.Exists(standalone)) return standalone;
             var npm = Path.Combine(roaming, "npm", "node_modules", "@openai");
             if (Directory.Exists(npm))
             {

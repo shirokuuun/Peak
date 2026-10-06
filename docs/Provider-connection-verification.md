@@ -4,7 +4,7 @@ Reviewed October 6, 2026.
 
 Enabling either usage switch opens connection setup. Existing Codex ChatGPT logins are reused; missing native CLIs can be installed from the fixed official provider installer URLs. Sign-in runs in the provider's own terminal/browser. Enabling Claude installs its bridge automatically, then waits for fresh reported subscription windows. Preferences still require Save changes. Connection actions are immediate and canceling preferences does not undo installations, logins or bridge setup.
 
-- Release build: zero warnings or errors; all 153 tests pass with no skips.
+- Release build: zero warnings or errors; all 154 tests pass with no skips.
 - Connection tests cover missing CLIs, native installer locations with stale PATH, npm native Codex resolution, configured credential-store inheritance, existing ChatGPT login, API-key account separation, recoverable transport failures, cancellation, and fresh versus stale Claude limits.
 - Claude integration tests run the actual installed status-line command through PowerShell and Git Bash, including a bridge path with spaces and Unicode. Fixture payloads produce the correct 25% used / 75% remaining snapshot without writing user data.
 - A development-PC read-only native Codex RPC check returned a signed-in account and two rate-limit windows through the configured login store. Account labels and raw responses were never logged or saved. This confirms compatibility on that machine, not on the affected person's machine.
