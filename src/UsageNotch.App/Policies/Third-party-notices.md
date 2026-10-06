@@ -1,6 +1,6 @@
 # Peak Notices
 
-Policy version 1.0 · October 6, 2026
+Policy version 1.1 · October 6, 2026
 
 ## Independent product
 

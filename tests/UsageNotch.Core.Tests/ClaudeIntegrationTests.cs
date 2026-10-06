@@ -62,6 +62,44 @@ public sealed class ClaudeIntegrationTests : IDisposable
         var output = await RunBridge("{}", Path.Combine(installed, "setup.json"));
         Assert.Equal("preserved-status", output.Trim());
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task InstalledStatusLineReceivesUsageThroughWindowsShells(bool gitBash)
+    {
+        var config = Path.Combine(_root, "settings.json");
+        var installed = Path.Combine(_root, "bridge with spaces é");
+        var snapshots = Path.Combine(_root, "snapshots");
+        new ClaudeBridgeSetup(config, installed).Install(BridgeFolder());
+        var command = JsonNode.Parse(File.ReadAllText(config))!["statusLine"]!["command"]!.GetValue<string>();
+        // Redirect only the snapshot destination so the actual installed shell command runs without touching user data.
+        var destination = snapshots.Replace('\\', '/').Replace("'", "''");
+        command = command.Replace(" --chain-file ", $" --output '{destination}' --chain-file ");
+        var shell = gitBash ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Git", "bin", "bash.exe") : "powershell.exe";
+        if (gitBash) Assert.True(File.Exists(shell), "Git for Windows is required for the status-line integration test.");
+        var info = new ProcessStartInfo(shell)
+        {
+            UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true,
+            RedirectStandardOutput = true, RedirectStandardError = true
+        };
+        if (!gitBash) { info.ArgumentList.Add("-NoProfile"); info.ArgumentList.Add("-NonInteractive"); }
+        info.ArgumentList.Add(gitBash ? "-c" : "-Command");
+        info.ArgumentList.Add(command);
+        using var child = Process.Start(info)!;
+        var output = child.StandardOutput.ReadToEndAsync();
+        var errors = child.StandardError.ReadToEndAsync();
+        await child.StandardInput.WriteAsync("""{"session_id":"fixture","rate_limits":{"five_hour":{"used_percentage":25,"resets_at":2000000000}}}""");
+        child.StandardInput.Close();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        try { await child.WaitForExitAsync(timeout.Token); }
+        finally { if (!child.HasExited) child.Kill(entireProcessTree: true); }
+        Assert.True(child.ExitCode == 0, await errors);
+        Assert.Contains("75% left", await output);
+        await using var provider = new ClaudeSnapshotProvider(snapshots, () => "claude.exe");
+        var reading = await provider.RefreshAsync(default);
+        Assert.Equal(25, Assert.Single(reading.Windows).UsedPercent!.Value);
+    }
     private async Task<string> RunBridge(string input, string? chainFile = null)
     {
         var info = new ProcessStartInfo(Path.Combine(BridgeFolder(), "UsageNotch.ClaudeBridge.exe"))

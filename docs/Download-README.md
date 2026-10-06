@@ -17,15 +17,18 @@ Windows 10 version 2004 or later, or Windows 11, x64. The complete package inclu
 - Installer: run the official Setup.exe. Installs for your Windows user under LocalAppData/Programs/Peak and adds a Start menu shortcut. Administrator access is not needed.
 - Portable: extract the entire ZIP to a folder you own, then run Peak/Peak.exe. Keep all files together, including bridge, Policies and licenses. Peak.exe alone is incomplete. Preferences still use LocalAppData/UsageNotch to preserve upgrades.
 
-Version 1.0.0 is unsigned. Windows may show a publisher or reputation warning. Verify the download source and the published SHA-256 checksum, and follow your organization's software policy. A matching checksum establishes file consistency, not a trusted publisher signature. Do not disable Windows protections to install Peak.
+Version 1.0.1 is unsigned. Windows may show a publisher or reputation warning. Verify the download source and the published SHA-256 checksum, and follow your organization's software policy. A matching checksum establishes file consistency, not a trusted publisher signature. Do not disable Windows protections to install Peak.
 
 ## Connect your providers
 
-Providers start disabled. Read Privacy in Settings before enabling access. Use Providers to enable Codex usage, Codex tasks or Claude usage. A supported installed CLI and your own eligible provider account are required.
+Providers start disabled. Read Privacy in Settings, then turn on the usage switches for the providers you use. Peak checks installations and existing logins automatically. No terminal commands are needed for the normal connection flow.
 
-Codex usage reads the installed CLI's local app-server interface. Task monitoring uses local lifecycle logs and optional observer hooks. If you connect hooks, review and trust them in Codex /hooks and reconnect existing chats. Peak observes requests; approvals stay in your provider tool.
+- Codex: enable Codex usage. If missing, choose Install & connect for the official Windows Codex CLI installer. If signed out, choose Sign in & connect and finish ChatGPT sign-in in your browser. Peak respects the CLI's existing credential store. API-key billing does not supply personal subscription limits.
+- Claude: enable Claude usage. Peak installs its status-line bridge automatically while preserving previous output and a protected restoration backup. Install & connect opens the official Windows Claude Code installer if missing. Open Claude Code, sign in with Pro or Max, then send a prompt and wait for its response. Restart existing sessions to load the bridge. The chat website/desktop app alone and API-key accounts do not supply these limits.
+- Click Save changes to keep usage enabled. Peak refreshes automatically. Install, sign-in and bridge actions apply immediately; canceling preferences does not undo them.
+- Codex tasks: enable task activity and choose Connect task activity. Review and trust Peak hooks in Codex /hooks and reconnect existing chats. Peak observes requests; approvals stay in your provider tool. Claude task or approval monitoring is not included.
 
-Claude usage uses the status-line bridge. Connecting it preserves the previous command's output and a protected restoration backup. Restart existing sessions after connecting or disconnecting. Claude task and approval monitoring are not included. Missing readings are unknown, not zero; older CLIs may not report supported quota fields.
+If setup cannot find a CLI after installation, restart Peak and check codex --version or claude --version in a new PowerShell window. Missing readings are unknown, not zero. Claude's project-level statusLine settings can override the user-level bridge. Help: https://peakforwindows.vercel.app/download/#setup
 
 Right-click Peak's tray icon for Settings or Exit. The default reveal shortcut is Ctrl+Alt+U. Choose another in Settings if it conflicts. For sample data, run Peak.exe --demo; normal startup always uses the providers you enable.
 

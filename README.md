@@ -23,15 +23,11 @@ All percentages and bars in the UI show **remaining** usage. Alert thresholds us
 
 ## Connect Codex
 
-The app reads the documented native Codex `app-server` interface. It does not start model turns. Codex's Windows credential store is required; an existing file-based CLI login may not be visible to the notch.
+Enable **Codex usage** in Settings → Providers. Peak checks for the Windows Codex CLI and reuses its existing ChatGPT login. If the CLI is missing, choose **Install & connect** to open the official provider installer. If signed out, choose **Sign in & connect** and finish the provider's browser sign-in. Save changes to keep usage enabled; Peak refreshes automatically.
 
-1. In your user-level Codex `config.toml`, set `cli_auth_credentials_store = "keyring"`.
-2. Run `codex login` yourself and complete the ChatGPT sign-in.
-3. Enable Codex in Settings → Providers, then refresh the notch. New installations start with every provider disabled.
+Peak reads the native Codex `app-server` interface without starting model turns. It honors the CLI's configured credential store and disables analytics and OpenTelemetry only in its child process. Peak never reads, copies, migrates or deletes `auth.json`, and never stores an API key or session token. After a missing login, the next refresh starts a new child process so a completed external login can be picked up.
 
-Alternatively, launch the CLI with a process-specific keyring override as documented by Codex. This app always applies `cli_auth_credentials_store="keyring"` to its child process and disables that process's analytics and OpenTelemetry exporter. It never reads, copies, migrates, or deletes `auth.json`, and never stores an API key or session token. Do not paste credentials into this app.
-
-Native `codex.exe` discovery checks PATH, a bounded npm package location, and the Codex desktop app's bundled CLI location. Account quotas and reset timestamps come from `account/read` and `account/rateLimits/read`. Optional `account/usage/read` totals are activity, not a quota denominator. API-key billing is separate from ChatGPT subscription usage. New quota buckets are displayed independently; quota sizes are never hard-coded.
+Native `codex.exe` discovery checks PATH, the native installer location, the npm package location and the desktop app's bundled CLI location. Account quotas and reset timestamps come from `account/read` and `account/rateLimits/read`. Optional `account/usage/read` totals are activity, not a quota denominator. API-key billing is separate from ChatGPT subscription usage. New quota buckets are displayed independently; quota sizes are never hard-coded.
 
 If the live interface fails, a bounded recent local-log fallback may show the last reported percentages. Its account identity is unverified, so those readings are excluded from the compact summary and alerts. No token-count-to-subscription-limit estimates are fabricated.
 
@@ -47,11 +43,11 @@ Without trusted hook events, recent local logs provide activity, finished-turn o
 
 ## Connect Claude
 
-In Settings, click **Connect Claude**, enable Claude, and save. Restart Claude Code and use it once. The bridge writes only quota percentages, reset timestamps, CLI version, a hashed activity fingerprint, and a local observation timestamp. It keeps the existing status-line command's output and restores that command on Disconnect, unless you have since changed it yourself. Connect/Disconnect applies immediately; Cancel only discards the other settings fields.
+Enable **Claude usage** in Settings → Providers. Peak installs its status-line bridge automatically. It reuses a current reported reading, or guides you through installing and opening the Windows Claude Code CLI. Sign in with Claude Pro or Max, send a prompt and wait for a response. Existing sessions must be restarted to load the bridge. Save changes to keep usage enabled. The bridge writes only quota percentages, reset timestamps, CLI version, a hashed activity fingerprint, and a local observation timestamp. It keeps the existing status-line command's output and restores that command on Disconnect, unless you have since changed it yourself. Connect/Disconnect applies immediately; Cancel only discards the other settings fields.
 
 The published bridge is copied to `%LOCALAPPDATA%/UsageNotch/bridge` so the CLI command has a stable path. Setup changes only the user-level `statusLine` entry in Claude's settings, saving only its previous value. Unrelated settings are preserved, although JSON formatting/comments are normalized. If a project-specific status line overrides the user setting, it must be adjusted manually.
 
-This uses Claude Code's documented `rate_limits.five_hour` and `rate_limits.seven_day` status-line fields. Current documentation requires **Claude Code 2.1.251+**, a supported subscription, and an initial API response. Older CLIs or unsupported plans can omit these fields. Older Claude CLI versions need updating before quota data can be verified live.
+This uses Claude Code's documented `rate_limits.five_hour` and `rate_limits.seven_day` status-line fields. They require a **Claude Pro or Max subscription** and an initial API response from Claude Code. Use an up-to-date CLI. The Claude chat app or website, API-key accounts and a configured gateway's spend-limit field do not provide these personal subscription windows to Peak. Installing a bridge alone does not authenticate an account.
 
 Claude readings update during CLI activity. Repeated identical redraws do not refresh the observation timestamp. After five minutes they are marked stale. Expired windows say “Awaiting provider update”; the app never assumes a reset means 0% usage. The personal-account binding is an explicit v1 assumption: status-line input does not identify the account. Disable/reconnect Claude after switching accounts; multiple accounts are not supported yet.
 

@@ -35,7 +35,7 @@ public sealed class CodexUsageProvider : IUsageProvider
     {
         _executable ??= ExecutableLocator.Find("codex");
         if (_executable is null)
-            return new ProviderProbe(false, null, new(true, false, true, true), "Codex CLI was not found.");
+            return new ProviderProbe(false, null, new(true, false, true, true), "Install the Windows Codex CLI, sign in with codex login, then restart Peak.");
 
         _version ??= await ReadVersionAsync(_executable, cancellationToken).ConfigureAwait(false);
         return new ProviderProbe(true, _version, new(true, false, true, true));
@@ -62,11 +62,14 @@ public sealed class CodexUsageProvider : IUsageProvider
                 if (!account.TryGetProperty("account", out var identity) || identity.ValueKind == JsonValueKind.Null)
                 {
                     var unavailable = CodexUsageMapper.Map(account, default, null, _version, DateTimeOffset.UtcNow);
+                    // A login completed outside this process must be picked up on the next refresh.
+                    await _client.DisposeAsync().ConfigureAwait(false);
+                    _client = null;
                     var local = await _fallback.ReadLatestAsync(_version, cancellationToken).ConfigureAwait(false);
                     return local is null ? unavailable : local with
                     {
                         Connection = unavailable.Connection,
-                        Error = new("secure_login_required", "Secure CLI login needed for live usage. Local log below has an unverified account and is excluded from rings and alerts.", false)
+                        Error = new("secure_login_required", "Run codex login with ChatGPT, then refresh. Local readings have an unverified account and are excluded from rings and alerts.", false)
                     };
                 }
                 var limits = await _client.ReadRateLimitsAsync(cancellationToken).ConfigureAwait(false);
@@ -88,7 +91,7 @@ public sealed class CodexUsageProvider : IUsageProvider
                 return fallback ?? ProviderUsage.Waiting(Id, DisplayName) with
                 {
                     Connection = ConnectionState.Error,
-                    Error = new ProviderError("codex_unavailable", "Live Codex usage is unavailable. Check the CLI and its secure login, then refresh.", true)
+                    Error = new ProviderError("codex_unavailable", "Live Codex usage is unavailable. Check codex --version and codex login status, then refresh.", true)
                 };
             }
         }

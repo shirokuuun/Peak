@@ -17,10 +17,10 @@ The build contains its .NET runtime, so a separate .NET installation is unnecess
 ## Connect your Claude Code account
 
 1. Use the native Windows installation of Claude Code and sign in to your own Claude account. This test does not automatically connect a Claude installation inside WSL.
-2. For the personal 5-hour and weekly usage readings, use **Claude Code 2.1.251 or later** with a **Claude Pro or Max subscription**. These fields appear after Claude has returned its first response. See [Claude's rate-limit status-line documentation](https://code.claude.com/docs/en/statusline#rate-limit-usage).
+2. For the personal 5-hour and weekly usage readings, use an **up-to-date Claude Code CLI** with a **Claude Pro or Max subscription**. These fields appear after Claude has returned its first response. See [Claude's rate-limit status-line documentation](https://code.claude.com/docs/en/statusline#rate-limit-usage).
 3. Open the notch's **Settings** using the gear button or the tray menu.
 4. In Settings → **Providers**, turn off **Codex usage** and **Codex task activity** if you only use Claude.
-5. Click **Connect Claude**. Leave **Claude usage** enabled, then click **Save changes**.
+5. Enable **Claude usage**. Peak installs the bridge and opens connection setup. Install or open Claude Code there if needed, then click **Save changes**.
 6. Restart Claude Code, send a prompt, and wait for a response. Open the notch and click refresh if needed.
 
 Connect Claude installs a local status-line helper in `%LOCALAPPDATA%\UsageNotch\bridge` and updates the current user's Claude `statusLine` setting. It saves the previous status-line setting and chains its command so its output can continue to appear. The connection button applies immediately; Cancel does not undo it. Use **Disconnect** to restore the saved setting, provided it has not since been replaced by another tool.

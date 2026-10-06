@@ -13,6 +13,8 @@ public partial class SettingsWindow : Window
     private readonly AppSettings _original;
     private string _customColor;
     private bool _initializing = true;
+    private readonly bool _demo;
+    private bool _providerSetupOpen;
     private readonly ClaudeBridgeSetup _bridge = new();
     private readonly CodexTaskBridgeSetup _taskBridge = new();
     private readonly Dictionary<string, (FrameworkElement Page, string Title, string Description)> _sections = new();
@@ -26,6 +28,7 @@ public partial class SettingsWindow : Window
         PublishingConfiguration? publishing = null, bool firstRun = false)
     {
         _original = Result = settings.Normalize();
+        _demo = demo;
         _customColor = _original.CustomColor;
         InitializeComponent();
         DataContext = liveViewModel;
@@ -71,11 +74,12 @@ public partial class SettingsWindow : Window
         Monitor.SelectedItem = WindowPlatformService.MonitorNames.Contains(settings.MonitorDeviceName) ? settings.MonitorDeviceName : "Primary";
         Theme.ItemsSource = new[] { "System", "Dark", "Light", "Custom" }; Theme.SelectedItem = _original.Theme;
         TopOffset.Value = settings.TopOffset;
-        BridgeStatus.Text = _bridge.IsInstalled() ? "Connected. Restart Claude Code and use it to receive usage." :
-            "Connect adds a local usage bridge and preserves your current status line. Claude Code 2.1.251+ is required.";
+        CodexConnectionStatus.Text = "Enabling usage checks your existing login and offers installation or sign-in if needed.";
+        BridgeStatus.Text = _bridge.IsInstalled() ? "Bridge installed. Enable usage to check the connection, then save changes. Claude Code supplies usage after its first response." :
+            "Enabling usage installs the bridge and guides you through connecting Claude Code. Your existing status line is preserved.";
         if (demo)
         {
-            ConnectClaude.IsEnabled = DisconnectClaude.IsEnabled = LaunchOnStartup.IsEnabled = false;
+            ConnectCodex.IsEnabled = ConnectClaude.IsEnabled = DisconnectClaude.IsEnabled = LaunchOnStartup.IsEnabled = false;
             ConnectTasks.IsEnabled = DisconnectTasks.IsEnabled = false;
             TaskNotificationsEnabled.IsEnabled = false;
             TaskBridgeStatus.Text = "Demo preview · sample tasks. Task setup is disabled.";
@@ -190,17 +194,45 @@ public partial class SettingsWindow : Window
         catch { TaskBridgeStatus.Text = "Could not disconnect. Check Codex hooks.json permissions."; }
     }
     private void OnConnectClaude(object sender, RoutedEventArgs e)
+        => ConnectProvider("claude");
+
+    private void OnConnectCodex(object sender, RoutedEventArgs e)
+        => ConnectProvider("codex");
+
+    private void OnUsageEnabled(object sender, RoutedEventArgs e)
     {
+        if (_initializing || _demo || _providerSetupOpen) return;
+        ConnectProvider(ReferenceEquals(sender, CodexEnabled) ? "codex" : "claude");
+    }
+
+    private void ConnectProvider(string provider)
+    {
+        if (_demo || _providerSetupOpen) return;
+        _providerSetupOpen = true;
         try
         {
-            var folder = Path.Combine(AppContext.BaseDirectory, "bridge");
-            if (!Directory.Exists(folder)) folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
-                "../../../../UsageNotch.ClaudeBridge/bin/Debug/net10.0"));
-            _bridge.Install(folder);
-            ClaudeEnabled.IsChecked = true;
-            BridgeStatus.Text = "Connected. Restart Claude Code; usage appears after its first response. This connection is saved now.";
+            if (provider == "claude")
+            {
+                var folder = Path.Combine(AppContext.BaseDirectory, "bridge");
+                if (!Directory.Exists(folder)) folder = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
+                    "../../../../UsageNotch.ClaudeBridge/bin/Debug/net10.0"));
+                _bridge.Install(folder);
+                ClaudeEnabled.IsChecked = true;
+            }
+            else CodexEnabled.IsChecked = true;
+            var setup = new ProviderSetupWindow(provider) { Owner = this };
+            setup.ShowDialog();
+            var message = setup.Connected ? "Connected. Save changes to enable usage in Peak." :
+                setup.Status?.Message ?? "Setup canceled. Choose Connect to try again.";
+            if (provider == "claude") BridgeStatus.Text = message;
+            else CodexConnectionStatus.Text = message;
         }
-        catch (Exception exception) { BridgeStatus.Text = exception.Message; }
+        catch
+        {
+            if (provider == "claude") BridgeStatus.Text = "Could not prepare the Claude bridge. Check that the complete Peak package and Claude settings are writable, then reconnect.";
+            else CodexConnectionStatus.Text = "Could not open provider setup. Use the setup guide, then reconnect.";
+        }
+        finally { _providerSetupOpen = false; }
     }
     private void OnDisconnectClaude(object sender, RoutedEventArgs e)
     {
@@ -277,6 +309,7 @@ public partial class SettingsWindow : Window
     }
     private void OnWebsite(object sender, RoutedEventArgs e) => OpenLink(_publishing.WebsiteUrl);
     private void OnDownloads(object sender, RoutedEventArgs e) => OpenLink(_publishing.ReleasesUrl);
+    private void OnProviderSetup(object sender, RoutedEventArgs e) => OpenLink(_publishing.WebsiteUrl.TrimEnd('/') + "/download/#setup");
     private void OpenLink(string url)
     {
         if (!PublishingConfiguration.IsHttpsUrl(url)) return;

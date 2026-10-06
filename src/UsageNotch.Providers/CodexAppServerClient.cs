@@ -20,9 +20,22 @@ internal sealed class CodexAppServerClient : IAsyncDisposable
     {
         if (_process is { HasExited: false }) return;
 
+        _process = Process.Start(CreateStartInfo(_executable)) ?? throw new InvalidOperationException("Codex app-server did not start.");
+        _readerTask = ReadLoopAsync(_process, _lifetime.Token);
+        _ = DrainErrorsAsync(_process, _lifetime.Token);
+
+        await RequestAsync("initialize", new
+        {
+            clientInfo = new { name = "usage_notch", title = "Peak", version = "1.0.1" }
+        }, cancellationToken).ConfigureAwait(false);
+        await SendAsync(new { method = "initialized", @params = new { } }, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal static ProcessStartInfo CreateStartInfo(string executable)
+    {
         var startInfo = new ProcessStartInfo
         {
-            FileName = _executable,
+            FileName = executable,
             UseShellExecute = false,
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
@@ -32,9 +45,8 @@ internal sealed class CodexAppServerClient : IAsyncDisposable
         startInfo.ArgumentList.Add("app-server");
         startInfo.ArgumentList.Add("--listen");
         startInfo.ArgumentList.Add("stdio://");
-        // Process-scoped overrides: never modify user configuration or read auth.json.
-        startInfo.ArgumentList.Add("-c");
-        startInfo.ArgumentList.Add("cli_auth_credentials_store=\"keyring\"");
+        // Let the CLI use its configured login store. Peak never reads credentials itself.
+        // Telemetry overrides apply only to this child process.
         startInfo.ArgumentList.Add("-c");
         startInfo.ArgumentList.Add("analytics.enabled=false");
         startInfo.ArgumentList.Add("-c");
@@ -46,15 +58,7 @@ internal sealed class CodexAppServerClient : IAsyncDisposable
         startInfo.ArgumentList.Add("-c");
         startInfo.ArgumentList.Add("otel.log_user_prompt=false");
 
-        _process = Process.Start(startInfo) ?? throw new InvalidOperationException("Codex app-server did not start.");
-        _readerTask = ReadLoopAsync(_process, _lifetime.Token);
-        _ = DrainErrorsAsync(_process, _lifetime.Token);
-
-        await RequestAsync("initialize", new
-        {
-            clientInfo = new { name = "usage_notch", title = "Peak", version = "0.1.0" }
-        }, cancellationToken).ConfigureAwait(false);
-        await SendAsync(new { method = "initialized", @params = new { } }, cancellationToken).ConfigureAwait(false);
+        return startInfo;
     }
 
     public Task<JsonElement> ReadAccountAsync(CancellationToken cancellationToken) =>

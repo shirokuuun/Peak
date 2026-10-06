@@ -19,7 +19,7 @@ internal static class CodexUsageMapper
             {
                 Connection = TryGetProperty(accountResult, "requiresOpenaiAuth", out var required) && required.ValueKind == JsonValueKind.True
                     ? ConnectionState.AuthRequired : ConnectionState.Unsupported,
-                Error = new ProviderError("auth_required", "Sign in with Codex's Windows credential store, then refresh. See README for setup.", false)
+                Error = new ProviderError("auth_required", "Run codex login and sign in with ChatGPT, then refresh Peak.", false)
             };
 
         var email = GetString(account, "email");

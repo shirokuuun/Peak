@@ -6,11 +6,15 @@ namespace UsageNotch.Providers;
 public sealed class ClaudeSnapshotProvider : IUsageProvider, IUsageChangeSource
 {
     private readonly string _snapshotDirectory;
+    private readonly Func<string?> _findExecutable;
     private FileSystemWatcher? _watcher;
     public event EventHandler? Changed;
 
-    public ClaudeSnapshotProvider(string? snapshotDirectory = null)
+    public ClaudeSnapshotProvider(string? snapshotDirectory = null) : this(snapshotDirectory, () => ExecutableLocator.Find("claude")) { }
+
+    internal ClaudeSnapshotProvider(string? snapshotDirectory, Func<string?> findExecutable)
     {
+        _findExecutable = findExecutable;
         _snapshotDirectory = snapshotDirectory ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "claude");
         Directory.CreateDirectory(_snapshotDirectory);
@@ -27,17 +31,25 @@ public sealed class ClaudeSnapshotProvider : IUsageProvider, IUsageChangeSource
 
     public Task<ProviderProbe> ProbeAsync(CancellationToken cancellationToken)
     {
-        var available = ExecutableLocator.Find("claude") is not null;
+        var available = _findExecutable() is not null;
         return Task.FromResult(new ProviderProbe(available, null,
-            new(false, true, true, true), available ? null : "Claude Code was not found."));
+            new(false, true, true, true), available ? null : "Install the Windows Claude Code CLI, sign in, then restart Peak."));
     }
 
     public async Task<ProviderUsage> RefreshAsync(CancellationToken cancellationToken)
     {
-        if (!Directory.Exists(_snapshotDirectory)) return Waiting("Run Claude Code with the Peak bridge configured.");
-        var file = Directory.EnumerateFiles(_snapshotDirectory, "*.json")
-            .Select(path => new FileInfo(path)).OrderByDescending(item => item.LastWriteTimeUtc).FirstOrDefault();
-        if (file is null) return Waiting("Waiting for Claude Code usage data.");
+        var file = Directory.Exists(_snapshotDirectory) ? Directory.EnumerateFiles(_snapshotDirectory, "*.json")
+            .Select(path => new FileInfo(path)).OrderByDescending(item => item.LastWriteTimeUtc).FirstOrDefault() : null;
+        if (file is null)
+        {
+            var probe = await ProbeAsync(cancellationToken).ConfigureAwait(false);
+            if (!probe.Available) return Waiting(probe.Message!) with
+            {
+                Connection = ConnectionState.Unsupported,
+                Error = new ProviderError("cli_missing", probe.Message!, false)
+            };
+            return Waiting("Connect Claude in Settings > Providers and save. Restart the Claude Code terminal, sign in with Pro or Max, and receive its first response.");
+        }
 
         try
         {
@@ -60,7 +72,7 @@ public sealed class ClaudeSnapshotProvider : IUsageProvider, IUsageChangeSource
 
             return new ProviderUsage(1, "claude", "claude-personal", "Claude account", null,
                 windows.Count > 0 ? ConnectionState.Ready : ConnectionState.Waiting, [source], windows, [], observedAt,
-                windows.Count > 0 ? null : new ProviderError("quota_missing", "No quota fields yet. Claude Code 2.1.251+ and a supported subscription are required; use Claude Code once.", true));
+                windows.Count > 0 ? null : new ProviderError("quota_missing", "Claude Code is sending data but no subscription limits. Update the CLI, sign in with Claude Pro or Max, and receive a response. API-key accounts do not report these limits.", true));
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

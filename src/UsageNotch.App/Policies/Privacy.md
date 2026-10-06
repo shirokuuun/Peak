@@ -1,6 +1,6 @@
 # Peak Privacy
 
-Policy version 1.0 · October 6, 2026
+Policy version 1.1 · October 6, 2026
 
 ## What this notice covers
 
@@ -9,6 +9,8 @@ This notice covers Peak, published by **neorangel**, this website, GitHub downlo
 ## Provider access is your choice
 
 Providers start disabled. After you enable them, Codex usage comes through the installed CLI’s local app-server interface. Codex task activity may use bounded local lifecycle logs and trusted Peak observer hooks. Those original logs can contain private context; Peak processes them locally and does not upload them.
+
+Enabling a usage switch starts connection setup. Peak checks for an existing Windows CLI and login. Choosing Install & connect runs the provider's official installer in a visible terminal. Sign-in happens in the provider's terminal or browser; the provider manages its own credentials. Provider installations and logins remain until you remove them through the provider's tools.
 
 Claude usage is observed through a user-level status-line bridge. Connecting it preserves an existing command’s output and saves a Windows-user-protected restoration backup. Connection actions take effect immediately; canceling other preferences does not undo a connection.
 

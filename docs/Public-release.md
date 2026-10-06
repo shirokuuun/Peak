@@ -10,9 +10,9 @@ Use .NET 10 SDK, Windows x64 and Inno Setup. Increment the csproj version for ea
 
 ```powershell
 ./scripts/verify.ps1
-./scripts/publish.ps1 -PublicRelease -OutputDirectory dist/Peak-1.0.0
-./scripts/package-installer.ps1 -Published dist/Peak-1.0.0 -Unsigned
-./scripts/package-release.ps1 -Published dist/Peak-1.0.0
+./scripts/publish.ps1 -PublicRelease -OutputDirectory dist/Peak-1.0.1
+./scripts/package-installer.ps1 -Published dist/Peak-1.0.1 -Unsigned
+./scripts/package-release.ps1 -Published dist/Peak-1.0.1
 ```
 
 The first freeware release is explicitly unsigned. The website and user guide explain Windows warnings. For later signed builds, omit `-Unsigned` and pass `-CertificateThumbprint` and optional `-SignTool`. The signing path verifies trusted signatures and timestamps.
