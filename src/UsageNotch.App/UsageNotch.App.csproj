@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -14,11 +14,14 @@
     <Title>Peak</Title>
     <Description>Local AI subscription usage and task activity in your Windows notch.</Description>
     <RootNamespace>UsageNotch.App</RootNamespace>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="Assets\Notch.ico" />
-    <Resource Include="Assets\Providers\*.png" />
+    <Resource Include="Policies\*.md" />
+    <Content Include="Policies\*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="publishing.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <ProjectReference Include="..\UsageNotch.Core\UsageNotch.Core.csproj" />

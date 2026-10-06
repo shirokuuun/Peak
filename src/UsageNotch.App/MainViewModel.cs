@@ -417,7 +417,7 @@ public sealed class ProviderCardViewModel : ObservableObject
 {
     private readonly ProviderUsage _usage;
     public string Name => _usage.ProviderId == "claude" ? "Claude" : "Codex";
-    public string HeadingText => _usage.ProviderId == "codex" ? "Plan limits" : "Claude limits";
+    public string HeadingText => _usage.ProviderId == "codex" ? "Codex limits" : "Claude limits";
     public string PlanText => _usage.PlanName?.Value is { } value ? System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value) : "Plan unknown";
     public string NoticeText => _usage.Error?.Message ?? (_usage.Sources.Any(s => s.ToolVersion == "demo") ? "DEMO · sample data" : "");
     public string StatusText => _usage.Error?.Message ?? (_usage.ProviderId == "claude" ? "Personal CLI · " : "CLI · ") +

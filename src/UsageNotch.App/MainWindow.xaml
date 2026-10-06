@@ -6,27 +6,7 @@
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" SnapsToDevicePixels="True" UseLayoutRounding="True"
         Loaded="OnLoaded" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" KeyDown="OnKeyDown">
     <Window.Resources>
-        <!-- A stable dark backing preserves the original logos on any custom notch color. -->
-        <Style x:Key="ProviderLogoBadge" TargetType="Border">
-            <Setter Property="Width" Value="14"/>
-            <Setter Property="Height" Value="14"/>
-            <Setter Property="Background" Value="#090909"/>
-            <Setter Property="CornerRadius" Value="7"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="IsHitTestVisible" Value="False"/>
-        </Style>
-        <Style x:Key="ProviderLogoImage" TargetType="Image">
-            <Setter Property="Stretch" Value="Uniform"/>
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
-            <Setter Property="Source" Value="Assets/Providers/Codex.png"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Name}" Value="Claude">
-                    <Setter Property="Source" Value="Assets/Providers/Claude.png"/>
-                    <Setter Property="Margin" Value="2"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+
         <Style TargetType="ScrollBar">
             <Setter Property="Width" Value="4"/>
             <Setter Property="MinWidth" Value="4"/>
@@ -108,12 +88,9 @@
                                         <Border Background="Transparent" Padding="14" Margin="0,0,0,6">
                                             <StackPanel>
                                                 <Grid Height="26" ToolTip="{Binding StatusText}">
-                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="24"/><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                                    <Border Style="{StaticResource ProviderLogoBadge}" Width="20" Height="20" CornerRadius="10" HorizontalAlignment="Left">
-                                                        <Image Style="{StaticResource ProviderLogoImage}" AutomationProperties.Name="{Binding Name}"/>
-                                                    </Border>
-                                                    <TextBlock Grid.Column="1" Text="{Binding HeadingText}" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                                    <TextBlock Grid.Column="2" Text="{Binding PlanText}" Foreground="{DynamicResource MutedBrush}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+<TextBlock Text="{Binding HeadingText}" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding PlanText}" Foreground="{DynamicResource MutedBrush}" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                                 </Grid>
                                                 <TextBlock Text="{Binding NoticeText}" Style="{StaticResource OptionalText}" Foreground="{DynamicResource MutedBrush}" FontSize="10" TextWrapping="Wrap" Margin="0,0,0,6"/>
                                                 <Border Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="15" Padding="16,15,16,3" Margin="0,1,0,0">
@@ -206,9 +183,7 @@
                 <Grid Width="22" Height="22">
                     <Ellipse Stroke="{DynamicResource TrackBrush}" StrokeThickness="2" Margin="2"/>
                     <Path Data="{Binding CodexRing}" Stroke="{Binding CodexBrush}" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                    <Border Style="{StaticResource ProviderLogoBadge}">
-                        <Image Source="Assets/Providers/Codex.png" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" AutomationProperties.Name="Codex"/>
-                    </Border>
+                    <TextBlock Text="Cx" Foreground="{DynamicResource TextBrush}" FontSize="8" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" AutomationProperties.Name="Codex"/>
                 </Grid>
                 <TextBlock Text="{Binding CodexRemainingText}" Foreground="{DynamicResource TextBrush}" FontSize="11" FontWeight="SemiBold" Margin="7,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
@@ -223,9 +198,7 @@
                 <Grid Width="22" Height="22">
                     <Ellipse Stroke="{DynamicResource TrackBrush}" StrokeThickness="2" Margin="2"/>
                     <Path Data="{Binding ClaudeRing}" Stroke="{Binding ClaudeBrush}" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                    <Border Style="{StaticResource ProviderLogoBadge}">
-                        <Image Source="Assets/Providers/Claude.png" Margin="1" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" AutomationProperties.Name="Claude"/>
-                    </Border>
+                    <TextBlock Text="Cl" Foreground="{DynamicResource TextBrush}" FontSize="8" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" AutomationProperties.Name="Claude"/>
                 </Grid>
             </StackPanel>
         </Grid>

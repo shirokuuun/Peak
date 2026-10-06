@@ -5,9 +5,10 @@ namespace UsageNotch.Core;
 public sealed record AppSettings
 {
     public const int DefaultTopOffset = 12;
-    public bool CodexEnabled { get; init; } = true;
+    public bool CodexEnabled { get; init; }
     public bool ClaudeEnabled { get; init; }
-    public bool CodexTasksEnabled { get; init; } = true;
+    public bool CodexTasksEnabled { get; init; }
+    public int ProviderConsentVersion { get; init; }
     public bool TaskNotificationsEnabled { get; init; }
     public int RefreshIntervalSeconds { get; init; } = 60;
     public int WarningThreshold { get; init; } = 70;

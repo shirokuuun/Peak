@@ -1,4 +1,5 @@
 using System.IO;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,12 +18,18 @@ public partial class SettingsWindow : Window
     private readonly Dictionary<string, (FrameworkElement Page, string Title, string Description)> _sections = new();
     public event EventHandler? PeekRequested;
     public AppSettings Result { get; private set; }
-    public SettingsWindow(AppSettings settings, bool demo = false, MainViewModel? liveViewModel = null, bool shortcutAvailable = true)
+    private readonly PublishingConfiguration _publishing;
+    public bool ClearDataRequested { get; private set; }
+    public bool DisconnectRequested { get; private set; }
+    public bool RestartRequested { get; private set; }
+    public SettingsWindow(AppSettings settings, bool demo = false, MainViewModel? liveViewModel = null, bool shortcutAvailable = true,
+        PublishingConfiguration? publishing = null, bool firstRun = false)
     {
         _original = Result = settings.Normalize();
         _customColor = _original.CustomColor;
         InitializeComponent();
         DataContext = liveViewModel;
+        _publishing = publishing ?? new();
         _sections.Add("Presence", (PresencePage, "Presence", "Choose when Peak stays in view, and when it needs your attention."));
         _sections.Add("OutOfWay", (OutOfWayPage, "Out of the way", "Keep your screen within reach. Peak can step aside under the pointer."));
         _sections.Add("Appearance", (AppearancePage, "Appearance", "Make the notch yours. Its text and status colors adapt to your choice."));
@@ -30,6 +37,15 @@ public partial class SettingsWindow : Window
         _sections.Add("Alerts", (AlertsPage, "Alerts", "Choose which updates deserve a notification."));
         _sections.Add("Shortcuts", (ShortcutsPage, "Shortcuts", "Bring Peak back whenever you need it."));
         _sections.Add("System", (SystemPage, "System", "Manage startup, refresh timing, and local data."));
+        _sections.Add("Privacy", (PrivacyPage, "Privacy", "Choose what Peak can read, and manage the data it keeps."));
+        _sections.Add("About", (AboutPage, "About & Support", "Free to use. Find downloads, policies and help."));
+        AppVersion.Text = "Peak " + (typeof(SettingsWindow).Assembly.GetName().Version?.ToString(3) ?? "1.0.0");
+        PublisherDetails.Text = string.IsNullOrWhiteSpace(_publishing.PublisherName) ? "Development build" :
+            "Published by " + _publishing.PublisherName + "\n" + _publishing.SupportEmail;
+        ContactSupport.IsEnabled = PublishingConfiguration.IsSupportEmail(_publishing.SupportEmail);
+        OpenWebsite.IsEnabled = PublishingConfiguration.IsHttpsUrl(_publishing.WebsiteUrl);
+        OpenDownloads.IsEnabled = PublishingConfiguration.IsHttpsUrl(_publishing.ReleasesUrl);
+        LeaveDemo.Visibility = demo ? Visibility.Visible : Visibility.Collapsed;
         CodexEnabled.IsChecked = settings.CodexEnabled; ClaudeEnabled.IsChecked = settings.ClaudeEnabled;
         CodexTasksEnabled.IsChecked = settings.CodexTasksEnabled; TaskNotificationsEnabled.IsChecked = settings.TaskNotificationsEnabled;
         TaskBridgeStatus.Text = _taskBridge.IsInstalled() ? "Installed. Review and trust Peak hooks in Codex /hooks; reconnect existing chats. Hook observations start after trust." :
@@ -68,7 +84,9 @@ public partial class SettingsWindow : Window
         _initializing = false;
         UpdateColorDescription();
         UpdateBehaviorHints();
-        ShowSection("Presence");
+        if (firstRun) NavPrivacy.IsChecked = true;
+        else if (demo) NavAbout.IsChecked = true;
+        else ShowSection("Presence");
         Closed += (_, _) => { if (DialogResult != true) ThemeService.Apply(_original); };
     }
     private static void SelectChoice(Panel group, string value)
@@ -212,6 +230,7 @@ public partial class SettingsWindow : Window
         Result = (_original with
         {
             CodexEnabled = CodexEnabled.IsChecked == true, ClaudeEnabled = ClaudeEnabled.IsChecked == true,
+            ProviderConsentVersion = 1,
             CodexTasksEnabled = CodexTasksEnabled.IsChecked == true, TaskNotificationsEnabled = TaskNotificationsEnabled.IsChecked == true,
             RefreshIntervalSeconds = refresh, WarningThreshold = warning, CriticalThreshold = critical,
             NotificationsEnabled = NotificationsEnabled.IsChecked == true,
@@ -234,4 +253,42 @@ public partial class SettingsWindow : Window
         DialogResult = true;
     }
     private void OnCancel(object sender, RoutedEventArgs e) => DialogResult = false;
+
+    private void OnPolicy(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string file, Content: string title }) new PolicyWindow(title, file) { Owner = this }.ShowDialog();
+    }
+    private void OnOpenData(object sender, RoutedEventArgs e)
+    {
+        try { Process.Start(new ProcessStartInfo(new SettingsStore().DataDirectory) { UseShellExecute = true }); }
+        catch { ValidationMessage.Text = "Could not open Peak's data folder."; }
+    }
+    private void OnClearData(object sender, RoutedEventArgs e)
+    {
+        if (MessageBox.Show("Close or restart your Codex and Claude sessions first. This removes Peak's provider connections and local observations, including demo data. Your appearance preferences and restoration backups stay. Unsaved settings will be discarded. Continue?",
+            "Clear Peak observations", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+        ClearDataRequested = true; DialogResult = false;
+    }
+    private void OnDisconnectAll(object sender, RoutedEventArgs e)
+    {
+        if (MessageBox.Show("Remove Peak's Codex hooks and restore Claude's previous status line when it has not changed? Unrelated provider settings stay. Restart existing CLI sessions afterward. Unsaved settings will be discarded.",
+            "Disconnect providers", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+        DisconnectRequested = true; DialogResult = false;
+    }
+    private void OnWebsite(object sender, RoutedEventArgs e) => OpenLink(_publishing.WebsiteUrl);
+    private void OnDownloads(object sender, RoutedEventArgs e) => OpenLink(_publishing.ReleasesUrl);
+    private void OpenLink(string url)
+    {
+        if (!PublishingConfiguration.IsHttpsUrl(url)) return;
+        try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch { ValidationMessage.Text = "Could not open your browser. Visit " + url; }
+    }
+    private void OnSupport(object sender, RoutedEventArgs e)
+    {
+        if (!PublishingConfiguration.IsSupportEmail(_publishing.SupportEmail)) return;
+        try { Process.Start(new ProcessStartInfo("mailto:" + _publishing.SupportEmail) { UseShellExecute = true }); }
+        catch { ValidationMessage.Text = "Contact " + _publishing.SupportEmail + " for support."; }
+    }
+    private void OnLeaveDemo(object sender, RoutedEventArgs e)
+    { RestartRequested = true; DialogResult = false; }
 }

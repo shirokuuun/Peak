@@ -36,6 +36,7 @@ public sealed class CodexTaskBridgeSetup
         foreach (var name in CodexTaskEvents.HookNames)
             if (hooks[name] is not null && hooks[name] is not JsonArray) throw new IOException("Codex hook entries must be arrays; the existing file was preserved.");
         Directory.CreateDirectory(_bridge);
+        IntegrationRegistry.Record(Path.GetDirectoryName(_bridge)!, "codex", _config);
         foreach (var file in Directory.EnumerateFiles(sourceDirectory)) File.Copy(file, Path.Combine(_bridge, Path.GetFileName(file)), true);
         var exe = Path.Combine(_bridge, "UsageNotch.ClaudeBridge.exe").Replace('\\', '/');
         var command = $"\"{exe}\" --codex-event --observer {Marker}";

@@ -75,6 +75,7 @@ try
         }
     }
     finally { if (File.Exists(temporary)) File.Delete(temporary); }
+    ObservationRetention.Prune(outputRoot, false, DateTimeOffset.UtcNow);
     status = $"[{model}]" + (five is null ? "" : $" · 5h {Math.Max(0, 100 - five.Used):0}% left") +
              (week is null ? "" : $" · 7d {Math.Max(0, 100 - week.Used):0}% left");
 }

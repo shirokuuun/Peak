@@ -1,6 +1,6 @@
 # Peak
 
-A local Windows 10/11 overlay for personal AI subscription usage and Codex task activity. Built with C#/.NET 10 and WPF. No application database, remote backend, or telemetry. A rounded island rests at 360 × 42 DIPs, then smoothly stretches to 600 × 78 for confirmed work or attention requests. The expanded view uses inner information cards, remaining-usage bars, and a compact task activity footer inside one continuous outer shape. Dark, Light, System, and Custom themes are available. The custom Notch icon is embedded in the executable and used by its windows and system tray. Original Codex and Claude logos identify the compact 5-hour rings and expanded provider cards; their dark backings remain visible with any chosen notch color.
+A local Windows 10/11 overlay for personal AI subscription usage and Codex task activity. Built with C#/.NET 10 and WPF. No application database, remote usage backend, or telemetry. Peak is freeware with no activation, account or expiry. A rounded island rests at 360 × 42 DIPs, then smoothly stretches to 600 × 78 for confirmed work or attention requests. The expanded view uses inner information cards, remaining-usage bars, and a compact task activity footer inside one continuous outer shape. Dark, Light, System, and Custom themes are available. The custom Notch icon is embedded in the executable and used by its windows and system tray. Plain text provider names and Cx/Cl abbreviations identify the rings and cards. Third-party provider logos are not distributed.
 
 ## Run
 
@@ -27,7 +27,7 @@ The app reads the documented native Codex `app-server` interface. It does not st
 
 1. In your user-level Codex `config.toml`, set `cli_auth_credentials_store = "keyring"`.
 2. Run `codex login` yourself and complete the ChatGPT sign-in.
-3. Refresh the notch.
+3. Enable Codex in Settings → Providers, then refresh the notch. New installations start with every provider disabled.
 
 Alternatively, launch the CLI with a process-specific keyring override as documented by Codex. This app always applies `cli_auth_credentials_store="keyring"` to its child process and disables that process's analytics and OpenTelemetry exporter. It never reads, copies, migrates, or deletes `auth.json`, and never stores an API key or session token. Do not paste credentials into this app.
 
@@ -41,7 +41,7 @@ Settings → **Connect task activity** adds Peak observer entries to the user-le
 
 The bridge observes session, prompt, tool, permission-request, stop, and interruption events. It returns `{}` without an approval decision. Only chat/turn IDs, project leaf name, tool name, timestamps, and input fingerprints are saved. Prompts, commands, reasons, credentials, and outputs are discarded. Permission requests appear amber in task cards and the footer Review button. A request is evidence that approval was requested, not proof that a prompt is still pending: another hook may decide it. Completion, interruption, or later turn events clear it; after five minutes without evidence, active/requested states become unknown. Concurrent tool completions clear only matching requests. Optional review notifications default off.
 
-Without trusted hook events, recent local logs provide activity and finished-turn observations; the UI explicitly says approval monitoring needs setup. Missing approval data never means “no approvals.” Stored `thread/list` names are read without resuming chats; a separate app-server's runtime `notLoaded` state is deliberately ignored. Refresh reconciles events every five seconds, with a file watcher for faster updates and a one-minute metadata refresh. Bounded log tails are cached as lifecycle metadata only. Chat titles remain in memory.
+Without trusted hook events, recent local logs provide activity, finished-turn observations, and pending `request_user_input` questions. Questions appear as “Question for you” in the island and task cards; only the matching tool result, a later turn, or completion/interruption clears them. Local questions follow the same five-minute observation expiry. The UI still says approval monitoring needs setup: missing approval data never means “no approvals.” Stored `thread/list` names are read without resuming chats; a separate app-server's runtime `notLoaded` state is deliberately ignored. Refresh reconciles events every five seconds, with file watchers for hook and local-session changes and a one-minute metadata refresh. Bounded log tails are cached as lifecycle metadata and hashed question call IDs only; question text and answers are discarded. Chat titles remain in memory.
 
 **Disconnect** removes only the notch's observer entries and preserves unrelated hooks. Reconnect existing chats to stop hooks already loaded there. Full approval details and running command arguments stay in Codex; this version shows the tool category rather than storing potentially secret command text.
 
@@ -68,9 +68,11 @@ Peak preserves this legacy data location, observer identifiers, and single-insta
 - `bridge/setup.json`: the installed command and a DPAPI-encrypted backup of the previous status-line entry, readable only by your Windows user.
 - `codex-tasks/*.jsonl`: sanitized local Codex lifecycle observations; bounded recent tails are read for display.
 - `task-bridge/`: the local observer executable installed by Connect task activity. No credentials are stored there.
-- `startup-error.txt`: local startup diagnostics if startup fails.
+- `startup-error.txt`: startup timestamp and fault category only; expires after seven days during maintenance.
+- Legacy `license.dat`: ignored by freeware; preserved until explicit complete local-data deletion.
+- `integrations.json`: local provider configuration paths for reliable disconnection/uninstall.
 
-Provider CLI processes can make authenticated requests to their provider. The notch itself has no remote backend, telemetry, cookies, or unofficial web endpoint integration. Notification preferences default off. First readings are seeded silently; subsequent threshold crossings are deduplicated per account/window/cycle. Reset notifications require a later provider timestamp and lower usage after the previous reset time, rather than timer expiry alone.
+Provider CLI processes can make authenticated requests to their provider. Peak has no remote usage backend, telemetry, cookies, payment integration or unofficial provider web endpoint integration. Notification preferences default off. First readings are seeded silently; subsequent threshold crossings are deduplicated per account/window/cycle. Reset notifications require a later provider timestamp and lower usage after the previous reset time, rather than timer expiry alone.
 
 ## Build, test, publish
 
@@ -90,6 +92,18 @@ The expanded limits and task views share one outer outline. The header has a str
 Developer inspection: start the executable with `--inspect` to keep it visible over full-screen apps and expose a taskbar window for UI tooling. The normal app has no taskbar entry. `--demo` also enables that inspection behavior and uses isolated data. Do not enable launch-on-startup in inspection/demo mode.
 
 `--demo --demo-cycle` repeats idle, working, review and finished sample states for checking the island animations without contacting providers. Task progress is an activity indicator; the current task sources do not report a completion percentage. Elapsed time includes waiting, and an unobserved start is shown as observation age instead.
+
+## Freeware and privacy
+
+Peak is free for personal and workplace use on unlimited devices. No Peak account, payment, activation or expiry. Normal startup uses the providers you enable; sample data requires `--demo`. Provider subscriptions are separate. Source ownership is retained; freeware redistribution terms apply to complete unchanged official packages.
+
+Publisher: **neorangel**. Support: **peakforwindows.support@gmail.com**. Website: https://peakforwindows.vercel.app. Public binaries: https://github.com/shirokuuun/Peak-releases/releases. The application source repository stays private.
+
+Settings → **About & Support** shows the version, contact, downloads and policy links. **Privacy** manages provider consent, disconnection and owned observations. Clearing observations preserves preferences and restoration backups. Original provider logs are never deleted. Owned task events and Claude snapshots are pruned after seven days, capped at 10 MiB per folder; task files are capped at 512 KiB. Providers start disabled and migration preserves preferences while asking for consent.
+
+Public contact details are in `src/UsageNotch.App/publishing.json`. Blank details are allowed for development and do not restrict monitoring, but block public packaging. Old paid-license data is ignored, remains until explicit complete local deletion, and triggers no merchant requests. There is no payment integration in the build.
+
+See [public release instructions](docs/Public-release.md), [release checklist](docs/Release-checklist.md), and the user guide in [Download-README](docs/Download-README.md). Installer and portable packages include the runtime, bridge, complete notices and matching policy version 1.0. Updates are manual. The first release is explicitly unsigned and the download page explains Windows warnings.
 
 ## Architecture
 
@@ -115,11 +129,11 @@ flowchart LR
 
 ## Verification and limits
 
-All 94 automated tests pass. They cover quota mapping and freshness, notification deduplication, Claude bridge setup/privacy, task observer sanitization, concurrent approvals, new-turn/late-event ordering, request expiration, local-log limitations, catalog naming, hook install/remove preservation, the real Windows observer command with spaces and Unicode, island task priority and stability, unconfirmed activity staying compact, completion/expiry transitions, observed start timestamps, palette contrast, presence modes, reminder timing, full-screen priorities, pointer fading, recovery, legacy preference migration, preference serialization, and compact 5-hour selection without a weekly fallback. Native UI checks cover startup, expansion, hotkey recovery, settings, and the task preview. Real quota and hook observations must also be compared with Codex after secure login and hook trust; live Claude quotas require a CLI update.
+The release verification runs provider, privacy and freeware tests. These cover quota mapping and freshness, notification deduplication, Claude bridge setup/privacy, task observer sanitization, concurrent approvals, new-turn/late-event ordering, request expiration, local question detection and matching answers without hooks, sanitized question-cache round trips, local-session watcher updates, question/hook reconciliation, local-log limitations, catalog naming, hook install/remove preservation, the real Windows observer command with spaces and Unicode, island task priority and stability, unconfirmed activity staying compact, completion/expiry transitions, observed start timestamps, palette contrast, presence modes, reminder timing, full-screen priorities, pointer fading, recovery, legacy preference migration, preference serialization, and compact 5-hour selection without a weekly fallback. Native UI checks cover startup, expansion, hotkey recovery, settings, and the task preview. Real quota and hook observations must also be compared with Codex after secure login and hook trust; live Claude quotas require a CLI update.
 
 Transparent WPF windows, hotkey conflicts, mixed-DPI monitors, monitor hot-plugging, sleep/lock, and Windows notification suppression need further testing on additional machines. The app positions in physical pixels and reacts to DPI/display changes; an unavailable chosen monitor falls back to primary. The default top gap is 12 WPF pixels, scaled to the monitor's DPI and measured from the work area's top edge, respecting a top-docked taskbar. **Gap from top** in Settings remains adjustable from 0 to 200. The gap stays fixed while the notch expands downward. The refresh loop is single-flight with a 30-second total timeout and bounded failure backoff. Polling pauses during sleep/lock and refreshes on resume/unlock. Clock display is UTC-based and rendered in local time; it does not decrement saved timestamps or invent quota resets.
 
-The executable is unsigned. A signed installer/MSIX, trusted automatic updates, ARM64 builds, long-term charts, multiple accounts, and more providers remain follow-up work. Automatic update downloads are intentionally absent until a trusted release feed and signing identity are chosen. Windows toasts use the small Community Toolkit desktop compatibility package; Microsoft now recommends Windows App SDK notifications for new apps, which is a packaging/runtime tradeoff to revisit before wider distribution.
+The first freeware release is unsigned. Per-user installation and an optional signing pipeline are implemented. Additional clean-machine testing and a trusted publisher certificate remain follow-up work. Microsoft Store/MSIX, trusted automatic updates, ARM64 builds, long-term charts, multiple accounts, and more providers remain follow-up work. Automatic update downloads are intentionally absent until a trusted release feed and signing identity are chosen. Windows toasts use the small Community Toolkit desktop compatibility package; Microsoft now recommends Windows App SDK notifications for new apps, which is a packaging/runtime tradeoff to revisit before wider distribution.
 
 ## Provider references (checked September 30, 2026)
 

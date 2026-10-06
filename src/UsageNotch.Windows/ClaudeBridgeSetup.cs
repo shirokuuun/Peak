@@ -36,6 +36,7 @@ public sealed class ClaudeBridgeSetup
         if (File.Exists(StatePath) && !IsInstalled())
             throw new IOException("Claude's status line changed after setup. Disconnect the old bridge before reconnecting.");
         var previous = IsInstalled() ? ReadPrevious(Read(StatePath)) : config["statusLine"]?.DeepClone();
+        IntegrationRegistry.Record(Path.GetDirectoryName(_bridge)!, "claude", _config);
         Directory.CreateDirectory(_bridge);
         foreach (var file in Directory.EnumerateFiles(sourceDirectory))
             File.Copy(file, Path.Combine(_bridge, Path.GetFileName(file)), overwrite: true);

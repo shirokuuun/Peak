@@ -32,6 +32,8 @@ alert-state.json
 *.log
 *.jsonl
 startup-error.txt
+license.dat
+integrations.json
 TestResults/
 *.trx
 *.dmp
