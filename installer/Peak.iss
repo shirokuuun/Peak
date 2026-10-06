@@ -51,19 +51,8 @@ SignedUninstaller=yes
 #endif
 
 [Files]
-Source: "{#PublishDir}\*.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\*.deps.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\*.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\publishing.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\README.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#PublishDir}\bridge\*.exe"; DestDir: "{app}\bridge"; Flags: ignoreversion
-Source: "{#PublishDir}\bridge\*.dll"; DestDir: "{app}\bridge"; Flags: ignoreversion
-Source: "{#PublishDir}\bridge\*.deps.json"; DestDir: "{app}\bridge"; Flags: ignoreversion
-Source: "{#PublishDir}\bridge\*.runtimeconfig.json"; DestDir: "{app}\bridge"; Flags: ignoreversion
-Source: "{#PublishDir}\licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion recursesubdirs createallsubdirs
-
-Source: "{#PublishDir}\Policies\*"; DestDir: "{app}\Policies"; Flags: ignoreversion
+; The validated publish tree includes runtime satellite resources as well as the bridge and policies.
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{userprograms}\Peak"; Filename: "{app}\Peak.exe"

@@ -32,6 +32,10 @@ foreach ($peakFile in $peakRequired) {
 }
 $peakAllItems = @(Get-Item -LiteralPath $peakPublished) + @(Get-ChildItem -LiteralPath $peakPublished -Recurse -Force)
 if ($peakAllItems | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint }) { throw 'The published files contain a link. Packaging stopped.' }
+foreach ($peakFile in ($peakAllItems | Where-Object { -not $_.PSIsContainer })) {
+    if ($peakFile.Name -in 'commercial.json', 'license.dat', 'settings.json', 'auth.json', 'setup.json', 'integrations.json' -or
+        $peakFile.Extension -in '.pfx', '.key', '.pem', '.pdb', '.jsonl', '.log') { throw "Private, obsolete or debug file in published tree: $($peakFile.Name)" }
+}
 $peakVersion = (Get-Item -LiteralPath (Join-Path $peakPublished 'Peak.exe')).VersionInfo.ProductVersion.Split('+')[0]
 if ($peakVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'A semantic release version is required.' }
 $peakOutput = Join-Path $peakRoot 'artifacts/releases'
