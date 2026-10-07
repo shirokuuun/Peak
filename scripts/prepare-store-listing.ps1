@@ -10,4 +10,5 @@ foreach ($peakScreen in 'limits-dark.png', 'limits-light.png', 'tasks-dark.png',
 Copy-Item -LiteralPath (Join-Path $Website 'public/media/peak-promo.mp4') -Destination $peakAssets
 Copy-Item -LiteralPath (Join-Path $peakRoot 'docs/Store-submission.md') -Destination (Join-Path $peakAssets 'Store-submission.md')
 Copy-Item -LiteralPath (Join-Path $peakRoot 'docs/Store-verification.md') -Destination (Join-Path $peakAssets 'Store-verification.md')
+Copy-Item -LiteralPath (Join-Path $peakRoot 'docs/Store-trailer.md') -Destination (Join-Path $peakAssets 'Store-trailer.md')
 Write-Output "Store listing copy and assets ready: $peakAssets"

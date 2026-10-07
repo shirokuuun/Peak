@@ -82,6 +82,8 @@ The prepared listing assets are in `artifacts/store/listing-assets`. The screens
 - Configure Peak's appearance and visibility.
 - Store edition settings and local-data controls — sample preview.
 
+For the supplied promo, use the [trailer upload guide](Store-trailer.md). Its 1920 × 1080 thumbnail, music captions and synchronized audio description are prepared under `artifacts/store/listing-assets/trailer`.
+
 ## Notes for certification
 
 Peak is a self-contained WPF desktop utility; it requires no administrator privileges, driver or Windows service. The runFullTrust capability is needed to display its tray/desktop overlay, use native window and hotkey APIs, query the user's installed Codex CLI app-server, and connect to local Codex/Claude configuration and observation files after the user opts in. It does not read or save provider credential files, approve provider tools, or issue model prompts.
