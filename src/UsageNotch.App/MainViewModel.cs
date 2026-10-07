@@ -354,7 +354,8 @@ public sealed class MainViewModel : ObservableObject, IAsyncDisposable
     public async Task ApplySettingsAsync(AppSettings settings)
     {
         settings = settings.Normalize();
-        if (settings.LaunchOnStartup != Settings.LaunchOnStartup) new StartupService().SetEnabled(settings.LaunchOnStartup);
+        if (settings.LaunchOnStartup != Settings.LaunchOnStartup)
+            settings = settings with { LaunchOnStartup = await new StartupService().SetEnabledAsync(settings.LaunchOnStartup) };
         await _store.SaveAsync(settings);
         Settings = settings;
         Raise(nameof(RecoveryHint));

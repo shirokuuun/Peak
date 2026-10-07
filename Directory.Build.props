@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup Condition="'$(PeakStoreBuild)' == 'true'">
+    <DefineConstants>$(DefineConstants);PEAK_STORE</DefineConstants>
+  </PropertyGroup>
+</Project>

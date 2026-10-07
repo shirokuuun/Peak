@@ -15,8 +15,7 @@ public sealed class ClaudeSnapshotProvider : IUsageProvider, IUsageChangeSource
     internal ClaudeSnapshotProvider(string? snapshotDirectory, Func<string?> findExecutable)
     {
         _findExecutable = findExecutable;
-        _snapshotDirectory = snapshotDirectory ?? Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "claude");
+        _snapshotDirectory = snapshotDirectory ?? Path.Combine(PeakDataPaths.Root, "claude");
         Directory.CreateDirectory(_snapshotDirectory);
         _watcher = new FileSystemWatcher(_snapshotDirectory, "*.json") { NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite };
         _watcher.Created += (_, _) => Changed?.Invoke(this, EventArgs.Empty);

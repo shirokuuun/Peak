@@ -14,7 +14,7 @@ public sealed class ClaudeBridgeSetup
     {
         _config = configPath ?? Path.Combine(Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") ??
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".claude"), "settings.json");
-        _bridge = bridgeDirectory ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "bridge");
+        _bridge = bridgeDirectory ?? Path.Combine(PeakDataPaths.Root, "bridge");
     }
 
     public bool IsInstalled()

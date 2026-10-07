@@ -6,8 +6,7 @@ namespace UsageNotch.Windows;
 public sealed class LocalDataCleanup
 {
     public string Root { get; }
-    public LocalDataCleanup(string? root = null) => Root = Path.GetFullPath(root ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch"));
+    public LocalDataCleanup(string? root = null) => Root = Path.GetFullPath(root ?? PeakDataPaths.Root);
 
     public void PruneObservations()
     {

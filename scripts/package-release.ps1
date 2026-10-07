@@ -2,6 +2,7 @@ param([string]$Published = (Join-Path $PSScriptRoot '../dist/Peak'))
 $ErrorActionPreference = 'Stop'
 $peakRoot = Split-Path -Parent $PSScriptRoot
 $peakPublished = [IO.Path]::GetFullPath($Published, $peakRoot)
+if (Test-Path -LiteralPath (Join-Path $peakPublished 'store-build.json')) { throw 'A Store build must use package-store.ps1 and Partner Center, not a public portable release.' }
 & (Join-Path $PSScriptRoot 'check-publication.ps1') -Configuration (Join-Path $peakPublished 'publishing.json')
 foreach ($peakRequired in @('Peak.exe', 'Peak.dll', 'coreclr.dll', 'PresentationFramework.dll', 'bridge/UsageNotch.ClaudeBridge.exe', 'licenses/dependencies.txt', 'Policies/Terms.md', 'Policies/Privacy.md', 'Policies/Third-party-notices.md', 'README.md')) {
     if (-not (Test-Path -LiteralPath (Join-Path $peakPublished $peakRequired) -PathType Leaf)) { throw "Missing self-contained release file: $peakRequired" }

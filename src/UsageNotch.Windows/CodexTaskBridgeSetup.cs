@@ -13,7 +13,7 @@ public sealed class CodexTaskBridgeSetup
     {
         _config = configPath ?? Path.Combine(Environment.GetEnvironmentVariable("CODEX_HOME") ??
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex"), "hooks.json");
-        _bridge = bridgeDirectory ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "task-bridge");
+        _bridge = bridgeDirectory ?? Path.Combine(PeakDataPaths.Root, "task-bridge");
     }
 
     public bool IsInstalled()

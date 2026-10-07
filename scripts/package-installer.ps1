@@ -10,6 +10,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $peakRoot = Split-Path -Parent $PSScriptRoot
 $peakPublished = [IO.Path]::GetFullPath($Published, $peakRoot)
+if (Test-Path -LiteralPath (Join-Path $peakPublished 'store-build.json')) { throw 'A Store build must use package-store.ps1 and Partner Center, not the website installer.' }
 if (-not $UnsignedTest) {
     & (Join-Path $PSScriptRoot 'check-publication.ps1') -Configuration (Join-Path $peakPublished 'publishing.json')
     if (-not $CertificateThumbprint -and -not $Unsigned) { throw 'Supply a signing certificate or explicitly choose -Unsigned for the first freeware release.' }

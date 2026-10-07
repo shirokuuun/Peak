@@ -24,6 +24,7 @@ public partial class SettingsWindow : Window
     public bool ClearDataRequested { get; private set; }
     public bool DisconnectRequested { get; private set; }
     public bool RestartRequested { get; private set; }
+    public bool DemoRequested { get; private set; }
     public SettingsWindow(AppSettings settings, bool demo = false, MainViewModel? liveViewModel = null, bool shortcutAvailable = true,
         PublishingConfiguration? publishing = null, bool firstRun = false)
     {
@@ -31,6 +32,7 @@ public partial class SettingsWindow : Window
         _demo = demo;
         _customColor = _original.CustomColor;
         InitializeComponent();
+        StoreInstallNotes.Visibility = PeakDataPaths.IsStoreBuild ? Visibility.Visible : Visibility.Collapsed;
         DataContext = liveViewModel;
         _publishing = publishing ?? new();
         _sections.Add("Presence", (PresencePage, "Presence", "Choose when Peak stays in view, and when it needs your attention."));
@@ -48,6 +50,13 @@ public partial class SettingsWindow : Window
         ContactSupport.IsEnabled = PublishingConfiguration.IsSupportEmail(_publishing.SupportEmail);
         OpenWebsite.IsEnabled = PublishingConfiguration.IsHttpsUrl(_publishing.WebsiteUrl);
         OpenDownloads.IsEnabled = PublishingConfiguration.IsHttpsUrl(_publishing.ReleasesUrl);
+        if (PeakDataPaths.IsStoreBuild)
+        {
+            AppVersion.Text += " · Microsoft Store";
+            UpdateDescription.Text = "No Peak account, payment, activation or expiry. Your provider subscriptions remain separate. Updates are managed by Microsoft Store.";
+            OpenDownloads.Content = "Setup guide";
+        }
+        EnterDemo.Visibility = demo ? Visibility.Collapsed : Visibility.Visible;
         LeaveDemo.Visibility = demo ? Visibility.Visible : Visibility.Collapsed;
         CodexEnabled.IsChecked = settings.CodexEnabled; ClaudeEnabled.IsChecked = settings.ClaudeEnabled;
         CodexTasksEnabled.IsChecked = settings.CodexTasksEnabled; TaskNotificationsEnabled.IsChecked = settings.TaskNotificationsEnabled;
@@ -79,6 +88,7 @@ public partial class SettingsWindow : Window
             "Enabling usage installs the bridge and guides you through connecting Claude Code. Your existing status line is preserved.";
         if (demo)
         {
+            ClearObservations.IsEnabled = DisconnectProviders.IsEnabled = false;
             ConnectCodex.IsEnabled = ConnectClaude.IsEnabled = DisconnectClaude.IsEnabled = LaunchOnStartup.IsEnabled = false;
             ConnectTasks.IsEnabled = DisconnectTasks.IsEnabled = false;
             TaskNotificationsEnabled.IsEnabled = false;
@@ -297,18 +307,21 @@ public partial class SettingsWindow : Window
     }
     private void OnClearData(object sender, RoutedEventArgs e)
     {
+        if (_demo) return;
         if (MessageBox.Show("Close or restart your Codex and Claude sessions first. This removes Peak's provider connections and local observations, including demo data. Your appearance preferences and restoration backups stay. Unsaved settings will be discarded. Continue?",
             "Clear Peak observations", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes) return;
         ClearDataRequested = true; DialogResult = false;
     }
     private void OnDisconnectAll(object sender, RoutedEventArgs e)
     {
+        if (_demo) return;
         if (MessageBox.Show("Remove Peak's Codex hooks and restore Claude's previous status line when it has not changed? Unrelated provider settings stay. Restart existing CLI sessions afterward. Unsaved settings will be discarded.",
             "Disconnect providers", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
         DisconnectRequested = true; DialogResult = false;
     }
     private void OnWebsite(object sender, RoutedEventArgs e) => OpenLink(_publishing.WebsiteUrl);
-    private void OnDownloads(object sender, RoutedEventArgs e) => OpenLink(_publishing.ReleasesUrl);
+    private void OnDownloads(object sender, RoutedEventArgs e) => OpenLink(PeakDataPaths.IsStoreBuild
+        ? _publishing.WebsiteUrl.TrimEnd('/') + "/download/#setup" : _publishing.ReleasesUrl);
     private void OnProviderSetup(object sender, RoutedEventArgs e) => OpenLink(_publishing.WebsiteUrl.TrimEnd('/') + "/download/#setup");
     private void OpenLink(string url)
     {
@@ -324,4 +337,6 @@ public partial class SettingsWindow : Window
     }
     private void OnLeaveDemo(object sender, RoutedEventArgs e)
     { RestartRequested = true; DialogResult = false; }
+    private void OnEnterDemo(object sender, RoutedEventArgs e)
+    { DemoRequested = true; DialogResult = false; }
 }

@@ -91,7 +91,7 @@ Developer inspection: start the executable with `--inspect` to keep it visible o
 
 ## Freeware and privacy
 
-Peak is free for personal and workplace use on unlimited devices. No Peak account, payment, activation or expiry. Normal startup uses the providers you enable; sample data requires `--demo`. Provider subscriptions are separate. Source ownership is retained; freeware redistribution terms apply to complete unchanged official packages.
+Peak is free for personal and workplace use on unlimited devices. No Peak account, payment, activation or expiry. Normal startup uses the providers you enable; sample data requires selecting Preview sample demo in About & Support or starting with `--demo`. Provider subscriptions are separate. Source ownership is retained; freeware redistribution terms apply to complete unchanged official packages.
 
 Publisher: **neorangel**. Support: **peakforwindows.support@gmail.com**. Website: https://peakforwindows.vercel.app. Public binaries: https://github.com/shirokuuun/Peak-releases/releases. The application source repository stays private.
 
@@ -99,7 +99,13 @@ Settings → **About & Support** shows the version, contact, downloads and polic
 
 Public contact details are in `src/UsageNotch.App/publishing.json`. Blank details are allowed for development and do not restrict monitoring, but block public packaging. Old paid-license data is ignored, remains until explicit complete local deletion, and triggers no merchant requests. There is no payment integration in the build.
 
-See [public release instructions](docs/Public-release.md), [release checklist](docs/Release-checklist.md), and the user guide in [Download-README](docs/Download-README.md). Installer and portable packages include the runtime, bridge, complete notices and matching policy version 1.0. Updates are manual. The first release is explicitly unsigned and the download page explains Windows warnings.
+See [public release instructions](docs/Public-release.md), [release checklist](docs/Release-checklist.md), and the user guide in [Download-README](docs/Download-README.md). Installer and portable packages include the runtime, bridge, complete notices and matching policy version 1.1. Updates to those editions are manual. The website release is explicitly unsigned and the download page explains Windows warnings.
+
+## Microsoft Store package
+
+The Store candidate uses the reserved identity in `store/identity.json`; source remains private. Build with `./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/Peak-Store`, then run `./scripts/package-store.ps1 -Published dist/Peak-Store`. The resulting unsigned MSIX is for Partner Center upload. Microsoft signs it after certification; it is not a trusted direct-download installer.
+
+The Store build uses `%USERPROFILE%/.peak/store` so the packaged app and external CLI bridges share observations without disabling package virtualization. It starts with separate preferences and disabled providers. Its optional launch-at-sign-in setting uses Windows' declared startup task and respects Task Manager opt-outs. Disconnect providers before changing editions or uninstalling. See [Store submission guide](docs/Store-submission.md) and [Store user guide](docs/Store-README.md).
 
 ## Architecture
 
@@ -129,7 +135,7 @@ The release verification runs provider, privacy and freeware tests. These cover 
 
 Transparent WPF windows, hotkey conflicts, mixed-DPI monitors, monitor hot-plugging, sleep/lock, and Windows notification suppression need further testing on additional machines. The app positions in physical pixels and reacts to DPI/display changes; an unavailable chosen monitor falls back to primary. The default top gap is 12 WPF pixels, scaled to the monitor's DPI and measured from the work area's top edge, respecting a top-docked taskbar. **Gap from top** in Settings remains adjustable from 0 to 200. The gap stays fixed while the notch expands downward. The refresh loop is single-flight with a 30-second total timeout and bounded failure backoff. Polling pauses during sleep/lock and refreshes on resume/unlock. Clock display is UTC-based and rendered in local time; it does not decrement saved timestamps or invent quota resets.
 
-The first freeware release is unsigned. Per-user installation and an optional signing pipeline are implemented. Additional clean-machine testing and a trusted publisher certificate remain follow-up work. Microsoft Store/MSIX, trusted automatic updates, ARM64 builds, long-term charts, multiple accounts, and more providers remain follow-up work. Automatic update downloads are intentionally absent until a trusted release feed and signing identity are chosen. Windows toasts use the small Community Toolkit desktop compatibility package; Microsoft now recommends Windows App SDK notifications for new apps, which is a packaging/runtime tradeoff to revisit before wider distribution.
+The website freeware release is unsigned. Per-user installation and an optional signing pipeline are implemented. A Microsoft Store MSIX candidate is prepared; certification, clean-machine testing and public Store availability remain outstanding. A trusted publisher certificate for direct downloads, ARM64 builds, long-term charts, multiple accounts, and more providers remain follow-up work. Website editions have no automatic update download; approved Store editions use Microsoft Store updates. Windows toasts use the small Community Toolkit desktop compatibility package; Microsoft now recommends Windows App SDK notifications for new apps, which is a packaging/runtime tradeoff to revisit before wider distribution.
 
 ## Provider references (checked September 30, 2026)
 

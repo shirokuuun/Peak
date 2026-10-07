@@ -44,7 +44,7 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
         _catalog = catalog;
         _codexRoot = codexRoot ?? Environment.GetEnvironmentVariable("CODEX_HOME") ??
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex");
-        _eventsRoot = eventsRoot ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "codex-tasks");
+        _eventsRoot = eventsRoot ?? Path.Combine(PeakDataPaths.Root, "codex-tasks");
         Directory.CreateDirectory(_eventsRoot);
         _watcher = new(_eventsRoot, "*.jsonl") { NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size };
         _watcher.Changed += OnChanged; _watcher.Created += OnChanged; _watcher.Deleted += OnChanged;

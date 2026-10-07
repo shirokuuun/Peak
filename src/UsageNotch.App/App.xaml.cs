@@ -108,7 +108,19 @@ public partial class App : Application
             ResetNotificationsEnabled = false, TaskNotificationsEnabled = false, CodexTasksEnabled = true,
             LaunchOnStartup = false, ClickThrough = false, ExpandOnHover = true, TopOffset = AppSettings.DefaultTopOffset };
         else new LocalDataCleanup().PruneObservations();
-        if (!inspect && settings.LaunchOnStartup) new StartupService().SetEnabled(true);
+        if (!inspect)
+        {
+            var startup = new StartupService();
+            if (await startup.GetPackagedEnabledAsync() is { } enabled)
+            {
+                if (enabled != settings.LaunchOnStartup)
+                {
+                    settings = settings with { LaunchOnStartup = enabled };
+                    await store.SaveAsync(settings);
+                }
+            }
+            else if (settings.LaunchOnStartup) await startup.SetEnabledAsync(true);
+        }
         var codex = demo ? null : new CodexUsageProvider();
         _viewModel = new MainViewModel(demo ? [new DemoProvider("codex", 90, 45), new DemoProvider("claude", 32, 68)] :
             [codex!, new ClaudeSnapshotProvider()], store, settings, await store.LoadCacheAsync(), await store.LoadAlertsAsync(),
@@ -164,6 +176,8 @@ public partial class App : Application
             if (dialog.ShowDialog() == true && _viewModel is not null)
             {
                 await _viewModel.ApplySettingsAsync(dialog.Result);
+                if (dialog.Result.LaunchOnStartup && !_viewModel.Settings.LaunchOnStartup)
+                    MessageBox.Show("Windows has disabled Peak at sign-in. Enable Peak in Windows Settings → Apps → Startup, then reopen Peak’s settings.", "Peak");
                 if (_viewModel.Settings.HideFromCapture && _window is { CaptureExclusionApplied: false })
                     MessageBox.Show("Your settings were saved, but Windows could not exclude Peak from capture. Check your recording preview before sharing.", "Peak");
                 if (_window is { RecoveryShortcutAvailable: false })
@@ -181,9 +195,9 @@ public partial class App : Application
                 await StartSessionAsync();
                 MessageBox.Show(errors.Count == 0 ? "Peak's providers are disconnected. Restart any existing CLI sessions to unload their old connections." : string.Join("\n", errors), "Peak privacy");
             }
-            if (dialog.RestartRequested)
+            if (dialog.RestartRequested || dialog.DemoRequested)
             {
-                _explicitDemo = false;
+                _explicitDemo = dialog.DemoRequested;
                 await StopSessionAsync(); await StartSessionAsync();
                 if (_firstRun) _ = Dispatcher.BeginInvoke(ShowSettings);
             }

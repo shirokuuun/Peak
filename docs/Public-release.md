@@ -2,7 +2,7 @@
 
 The source repository stays private. The public `shirokuuun/Peak-releases` repository holds only distribution documents and release packages. The separate `shirokuuun/peak-website` repository deploys to https://peakforwindows.vercel.app.
 
-Contact configuration: `src/UsageNotch.App/publishing.json`. Blank details are allowed in development without restricting monitoring, but block public packages. Policies version 1.0 are identical in app resources, package files and website content. Never ship credentials, observations, signing keys or debug artifacts.
+Contact configuration: `src/UsageNotch.App/publishing.json`. Blank details are allowed in development without restricting monitoring, but block public packages. Policies version 1.1 are identical in app resources, package files and website content. Never ship credentials, observations, signing keys or debug artifacts.
 
 ## Build and package
 

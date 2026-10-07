@@ -12,8 +12,7 @@ if (args.Contains("--codex-event"))
     {
         using var eventDocument = JsonDocument.Parse(input);
         if (CodexTaskEvents.Parse(eventDocument.RootElement, DateTimeOffset.UtcNow) is { } observation)
-            CodexTaskEventWriter.Write(observation, Option("--output") ?? Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "codex-tasks"));
+            CodexTaskEventWriter.Write(observation, Option("--output") ?? Path.Combine(PeakDataPaths.Root, "codex-tasks"));
     }
     catch { /* Observation failure must never block, approve, deny, or continue a Codex turn. */ }
     Console.WriteLine("{}");
@@ -28,8 +27,7 @@ try
     var week = ReadLimit(root, "seven_day");
     var model = root.TryGetProperty("model", out var modelNode) ? GetString(modelNode, "display_name") ?? "Claude" : "Claude";
     var version = GetString(root, "version");
-    var outputRoot = Option("--output") ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch", "claude");
+    var outputRoot = Option("--output") ?? Path.Combine(PeakDataPaths.Root, "claude");
     Directory.CreateDirectory(outputRoot);
     var session = GetString(root, "session_id") ?? "default";
     var file = Path.Combine(outputRoot, Hash(session)[..16] + ".json");

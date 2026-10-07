@@ -1,4 +1,4 @@
-param([switch]$FrameworkDependent, [switch]$PublicRelease, [string]$OutputDirectory)
+param([switch]$FrameworkDependent, [switch]$PublicRelease, [switch]$StoreBuild, [string]$OutputDirectory)
 $ErrorActionPreference = 'Stop'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $notchRoot = Split-Path -Parent $PSScriptRoot
@@ -24,10 +24,15 @@ if (Test-Path -LiteralPath $notchOutput) {
     Remove-Item -LiteralPath $notchOutput -Recurse -Force
 }
 $notchSelfContained = if ($FrameworkDependent) { 'false' } else { 'true' }
-& $notchDotnet publish (Join-Path $notchRoot 'src\UsageNotch.App\UsageNotch.App.csproj') -c Release -r win-x64 --self-contained $notchSelfContained -o $notchOutput --nologo -p:DebugType=None -p:DebugSymbols=false
+$peakBuildProperties = @('-p:DebugType=None', '-p:DebugSymbols=false', "-p:PeakStoreBuild=$($StoreBuild.IsPresent.ToString().ToLowerInvariant())")
+& $notchDotnet publish (Join-Path $notchRoot 'src\UsageNotch.App\UsageNotch.App.csproj') -c Release -r win-x64 --self-contained $notchSelfContained -o $notchOutput --nologo @peakBuildProperties
 if ($LASTEXITCODE -ne 0) { throw 'App publish failed.' }
-& $notchDotnet publish (Join-Path $notchRoot 'src\UsageNotch.ClaudeBridge\UsageNotch.ClaudeBridge.csproj') -c Release -r win-x64 --self-contained $notchSelfContained -o (Join-Path $notchOutput 'bridge') --nologo -p:DebugType=None -p:DebugSymbols=false
+& $notchDotnet publish (Join-Path $notchRoot 'src\UsageNotch.ClaudeBridge\UsageNotch.ClaudeBridge.csproj') -c Release -r win-x64 --self-contained $notchSelfContained -o (Join-Path $notchOutput 'bridge') --nologo @peakBuildProperties
 if ($LASTEXITCODE -ne 0) { throw 'Bridge publish failed.' }
 Copy-Item -LiteralPath (Join-Path $notchRoot 'docs/Download-README.md') -Destination (Join-Path $notchOutput 'README.md') -Force
+if ($StoreBuild) {
+    Copy-Item -LiteralPath (Join-Path $notchRoot 'docs/Store-README.md') -Destination (Join-Path $notchOutput 'README.md') -Force
+    [IO.File]::WriteAllText((Join-Path $notchOutput 'store-build.json'), '{"distribution":"microsoft-store","dataRoot":"user-profile/.peak/store"}' + "`n", [Text.UTF8Encoding]::new($false))
+}
 if (-not $FrameworkDependent) { & (Join-Path $PSScriptRoot 'copy-notices.ps1') -Published $notchOutput }
 Write-Output "Ready: $notchOutput\Peak.exe"

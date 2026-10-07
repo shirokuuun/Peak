@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap uap10 desktop com rescap">
+  <Identity Name="neorangel.Peak-AIUsageLimitsActivity"
+            Publisher="CN=1A8E4068-1357-4BD8-8811-797CDAFAA54F"
+            Version="1.0.2.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Peak - AI Usage Limits &amp; Activity</DisplayName>
+    <PublisherDisplayName>neorangel</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+  <Resources><Resource Language="en-US" /></Resources>
+  <Applications>
+    <Application Id="Peak" Executable="Peak.exe"
+                 uap10:RuntimeBehavior="packagedClassicApp" uap10:TrustLevel="mediumIL">
+      <uap:VisualElements DisplayName="Peak - AI Usage Limits &amp; Activity"
+                          Description="Local AI subscription usage limits and Codex task activity at a glance."
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
+        <uap:DefaultTile ShortName="Peak" />
+      </uap:VisualElements>
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="Peak.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="PeakStartup" Enabled="false" DisplayName="Peak" />
+        </desktop:Extension>
+        <desktop:Extension Category="windows.toastNotificationActivation">
+          <desktop:ToastNotificationActivation ToastActivatorCLSID="8C372BBF-BDAA-4AF2-B720-A082A4B88936" />
+        </desktop:Extension>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer Executable="Peak.exe" Arguments="-ToastActivated" DisplayName="Peak notification activator">
+              <com:Class Id="8C372BBF-BDAA-4AF2-B720-A082A4B88936" DisplayName="Peak notification activator" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities><rescap:Capability Name="runFullTrust" /></Capabilities>
+</Package>

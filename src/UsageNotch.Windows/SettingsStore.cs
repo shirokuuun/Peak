@@ -12,8 +12,7 @@ public sealed class SettingsStore
     };
 
     public string DataDirectory { get; }
-    public SettingsStore(string? dataDirectory = null) => DataDirectory = dataDirectory ?? Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UsageNotch");
+    public SettingsStore(string? dataDirectory = null) => DataDirectory = dataDirectory ?? PeakDataPaths.Root;
 
     public string SettingsPath => Path.Combine(DataDirectory, "settings.json");
     public string CachePath => Path.Combine(DataDirectory, "usage-cache.json");
