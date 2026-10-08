@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PeakAssemblyRoot Condition="'$(PeakAssemblyRoot)' == ''">../../dist/Peak-Store-1.0.2-final</PeakAssemblyRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Peak"><HintPath>$(PeakAssemblyRoot)/Peak.dll</HintPath></Reference>
+    <Reference Include="UsageNotch.Core"><HintPath>$(PeakAssemblyRoot)/UsageNotch.Core.dll</HintPath></Reference>
+    <Reference Include="UsageNotch.Windows"><HintPath>$(PeakAssemblyRoot)/UsageNotch.Windows.dll</HintPath></Reference>
+    <Reference Include="UsageNotch.Providers"><HintPath>$(PeakAssemblyRoot)/UsageNotch.Providers.dll</HintPath></Reference>
+    <Reference Include="CommunityToolkit.WinUI.Notifications"><HintPath>$(PeakAssemblyRoot)/CommunityToolkit.WinUI.Notifications.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>
