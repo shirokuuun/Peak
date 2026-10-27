@@ -9,7 +9,7 @@ public sealed record TaskActivitySummary(CodexTask? Task, IslandActivityKind Kin
 
     public static TaskActivitySummary Select(IReadOnlyList<CodexTask> tasks, DateTimeOffset now, string? preferredThread = null)
     {
-        // Unconfirmed local-log activity remains in Tasks; it must not hold the idle island open.
+        // Generic local-log activity remains in Tasks; confirmed turn lifecycle activity can show as Working.
         var fresh = tasks.Where(t => t.ObservedAt <= now.AddMinutes(2) && now - t.ObservedAt <= TimeSpan.FromMinutes(5)).ToArray();
         var active = fresh.Where(t => t.NeedsAttention || t.State == CodexTaskState.Working).ToArray();
         var candidates = active.Where(t => t.NeedsAttention).ToArray();

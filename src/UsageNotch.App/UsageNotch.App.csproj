@@ -14,11 +14,14 @@
     <Title>Peak</Title>
     <Description>Local AI subscription usage and task activity in your Windows notch.</Description>
     <RootNamespace>UsageNotch.App</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="Assets\Notch.ico" />
+    <Resource Include="Assets\Providers\*.png" />
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <Content Include="Assets\Fonts\LICENSE.txt" Link="licenses\Inter-OFL.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Resource Include="Policies\*.md" />
     <Content Include="Policies\*.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="publishing.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

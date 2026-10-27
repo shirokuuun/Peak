@@ -75,6 +75,7 @@ public partial class SettingsWindow : Window
         SelectChoice(AttentionChoices, _original.AttentionMode);
         SelectChoice(FullscreenChoices, _original.EffectiveFullscreenMode);
         SelectChoice(FadeChoices, _original.FadeSpeed);
+        SelectChoice(NotchStyleChoices, _original.NotchStyle);
         RecoveryShortcut.ItemsSource = new[] { "Ctrl + Alt + U", "Ctrl + Alt + P", "Ctrl + Shift + Space" };
         RecoveryShortcut.SelectedItem = NotchPresence.ShortcutLabel(_original.RecoveryShortcut);
         ShortcutStatus.Text = shortcutAvailable ? "Works while another app is in front. Also available from Peak's tray menu." :
@@ -138,6 +139,13 @@ public partial class SettingsWindow : Window
         };
         PointerOpacity.IsEnabled = FadeUnderPointer.IsChecked == true;
         FadeChoices.IsEnabled = FadeUnderPointer.IsChecked == true;
+        var fixedNotch = Choice(NotchStyleChoices, "DynamicIsland") == "FixedNotch";
+        TopOffset.IsEnabled = !fixedNotch;
+        TopOffsetHint.Text = fixedNotch ? "Fixed Notch sits flush with the top edge. Your saved gap returns when you choose Dynamic Island." :
+            "Leave room for tabs or a top taskbar. The gap stays fixed as Peak expands downward.";
+        NotchStyleHint.Text = fixedNotch ? "Attached to the screen edge, with a steady compact size until you open it." :
+            "A floating pill that grows when a task starts and opens smoothly for details.";
+        UpdateMiniPreview();
     }
     private void OnDragWindow(object sender, MouseButtonEventArgs e)
     {
@@ -148,6 +156,7 @@ public partial class SettingsWindow : Window
     {
         MiniNotch.Background = (System.Windows.Media.Brush)Application.Current.Resources["SurfaceBrush"];
         MiniNotch.BorderBrush = (System.Windows.Media.Brush)Application.Current.Resources["CardBorderBrush"];
+        MiniNotch.CornerRadius = Choice(NotchStyleChoices, "DynamicIsland") == "FixedNotch" ? new CornerRadius(0, 0, 12, 12) : new CornerRadius(18);
         var text = (System.Windows.Media.Brush)Application.Current.Resources["TextBrush"];
         MiniTitle.Foreground = MiniCodex.Foreground = MiniClaude.Foreground = text;
     }
@@ -280,6 +289,7 @@ public partial class SettingsWindow : Window
             LaunchOnStartup = LaunchOnStartup.IsChecked == true, ExpandOnHover = ExpandOnHover.IsChecked == true,
             ClickThrough = ClickThrough.IsChecked == true,
             PresenceMode = Choice(PresenceChoices, "Always"),
+            NotchStyle = Choice(NotchStyleChoices, "DynamicIsland"),
             FullscreenMode = Choice(FullscreenChoices, "Hidden"),
             AttentionMode = Choice(AttentionChoices, "UntilCleared"),
             AttentionDurationSeconds = (int)Math.Round(AttentionDuration.Value),

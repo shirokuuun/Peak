@@ -8,7 +8,7 @@
          IgnorableNamespaces="uap uap10 desktop com rescap">
   <Identity Name="neorangel.Peak-AIUsageLimitsActivity"
             Publisher="CN=1A8E4068-1357-4BD8-8811-797CDAFAA54F"
-            Version="1.0.2.0" ProcessorArchitecture="x64" />
+            Version="1.0.3.0" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>Peak - AI Usage Limits &amp; Activity</DisplayName>
     <PublisherDisplayName>neorangel</PublisherDisplayName>

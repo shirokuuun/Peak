@@ -1,5 +1,7 @@
 # Peak — Microsoft Store edition
 
+Choose **Settings → Appearance → Notch style** for a floating **Dynamic Island** or a **Fixed Notch** joined to the screen's top edge. Both open smoothly with no outer outline. Peak includes Inter typography and provider images; no font installation is needed.
+
 Publisher: neorangel · Support: peakforwindows.support@gmail.com
 
 Peak is free for personal and workplace use. It has no Peak account, payment, activation, device cap or expiry. Provider accounts and subscriptions are separate. Windows 10 version 2004 or later, or Windows 11, x64 is required. The .NET runtime is included.

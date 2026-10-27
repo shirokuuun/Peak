@@ -33,8 +33,9 @@ public static class NotchPresence
                 _ => visible
             };
         }
-        // Hover-only presence must remain usable; pinned details and attention requests take priority over fading.
-        var faded = visible && settings.FadeUnderPointer && settings.PresenceMode != "Hover" && pointerOver && !altPeek && !attention;
+        // Attention controls visibility; it must still honor the user's pointer-fading preference.
+        // Hover-only presence remains interactive, and pinned details and Alt peek stay readable.
+        var faded = visible && settings.FadeUnderPointer && settings.PresenceMode != "Hover" && pointerOver && !altPeek;
         return new(visible, faded ? Math.Clamp(settings.PointerOpacityPercent, 0, 100) / 100d : 1,
             faded || settings.ClickThrough && !altPeek);
     }

@@ -3,6 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
+        <FontFamily x:Key="PeakFont">pack://application:,,,/Peak;component/Assets/Fonts/#Inter</FontFamily>
+        <Style x:Key="PeakWindowStyle" TargetType="Window">
+            <Setter Property="FontFamily" Value="{StaticResource PeakFont}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+        </Style>
         <Style x:Key="OptionalText" TargetType="TextBlock">
             <Style.Triggers><Trigger Property="Text" Value=""><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers>
         </Style>
@@ -20,6 +26,7 @@
         <SolidColorBrush x:Key="AccentBrush" Color="#FF7F87FF"/>
         <SolidColorBrush x:Key="ActivityBrush" Color="#FF00BFFF"/>
         <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="Background" Value="{DynamicResource TrackBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>

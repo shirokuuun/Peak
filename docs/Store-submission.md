@@ -12,7 +12,9 @@ Package publisher: `CN=1A8E4068-1357-4BD8-8811-797CDAFAA54F`
 
 Open the current draft → Packages and upload:
 
-`D:\Languages\codex\notch\artifacts\store\Peak-1.0.2.0-Windows-x64-Store.msix`
+`D:\Languages\codex\notch\artifacts\store\Peak-1.0.3.0-Windows-x64-Store.msix`
+
+Version **1.0.3** is the next Store update after **1.0.2** and includes the current **development 1.0.5** changes. Not yet released on Microsoft Store. The Store and development version numbers advance independently.
 
 This x64 package includes the runtime, Claude/task bridge, policy bundle 1.1, licenses, Start-menu assets, notification registration and an optional Windows startup task. It starts with providers and startup disabled. It is intentionally unsigned for Partner Center ingestion. Microsoft signs Store-distributed MSIX packages after certification. Do not offer this unsigned upload as a public website download.
 
@@ -70,7 +72,7 @@ AI usage; usage limits; Codex; Claude Code; desktop utility; subscription monito
 
 ### What's new
 
-Initial Microsoft Store edition. Guided provider setup, a shared per-user bridge folder, Windows-managed startup and a sample preview available without provider sign-in.
+Smoother opening and closing with a borderless notch. Choose a floating Dynamic Island or a Fixed Notch attached to the top edge in Appearance settings. Updated Inter typography and provider icons. Improved ongoing Codex activity detection, including VS Code, resolved approval indicators, and hover fading for attention requests.
 
 ### Listing graphics
 
@@ -107,8 +109,10 @@ Reference: [Microsoft Store policies](https://learn.microsoft.com/en-us/windows/
 ## Rebuild
 
 ```powershell
-./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/Peak-Store
-./scripts/package-store.ps1 -Published dist/Peak-Store
+./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/store/Peak-1.0.3
+./scripts/package-store.ps1 -Published dist/store/Peak-1.0.3
 ```
 
-Generate logo size variants with `./scripts/create-store-assets.ps1` after changing the existing app icon. Preserve published or uploaded artifacts; increment the application version before a new submission. Website installer and portable packaging deliberately reject Store builds.
+The development version remains in `src/UsageNotch.App/UsageNotch.App.csproj`. Increment the independent Store version in `store/AppxManifest.xml` for the next submission, keeping its fourth component zero. `publish.ps1 -StoreBuild` applies that version to the complete Store build, including the bridge. `package-store.ps1` rejects a mismatched publication. The output marker and package metadata record which development version supplied its changes.
+
+Generate logo size variants with `./scripts/create-store-assets.ps1` after changing the existing app icon. Preserve published or uploaded artifacts. Website installer and portable packaging deliberately reject Store builds.

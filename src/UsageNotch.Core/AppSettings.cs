@@ -19,6 +19,7 @@ public sealed record AppSettings
     public bool ClickThrough { get; init; }
     public bool AutoHideFullscreen { get; init; } = true;
     public bool ExpandOnHover { get; init; } = true;
+    public string NotchStyle { get; init; } = "DynamicIsland";
     public string PresenceMode { get; init; } = "Always";
     public string? FullscreenMode { get; init; }
     public string AttentionMode { get; init; } = "UntilCleared";
@@ -45,6 +46,7 @@ public sealed record AppSettings
             WarningThreshold = warning,
             CriticalThreshold = Math.Clamp(CriticalThreshold, warning + 1, 100),
             TopOffset = Math.Clamp(TopOffset, 0, 200),
+            NotchStyle = NotchStyle == "FixedNotch" ? "FixedNotch" : "DynamicIsland",
             PresenceMode = PresenceMode is "Active" or "Hover" ? PresenceMode : "Always",
             FullscreenMode = EffectiveFullscreenMode,
             AutoHideFullscreen = EffectiveFullscreenMode != "Visible",

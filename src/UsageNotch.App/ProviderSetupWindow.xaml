@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Connect provider — Peak" Width="530" Height="440" MinWidth="430" MinHeight="380"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResize" Background="#151515" Foreground="#F5F5F5"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False" Style="{StaticResource PeakWindowStyle}">
     <Window.Resources>
         <SolidColorBrush x:Key="TextBrush" Color="#F5F5F5"/>
         <SolidColorBrush x:Key="TrackBrush" Color="#383838"/>
@@ -18,7 +18,7 @@
             <StackPanel>
                 <Border Background="#242424" CornerRadius="14" Padding="20">
                     <StackPanel>
-                        <TextBlock x:Name="StepTitle" Text="Checking your setup…" FontSize="17" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="StepTitle" Text="Checking your setup…" FontSize="17" FontWeight="Bold"/>
                         <TextBlock x:Name="StatusText" Text="Looking for an existing installation and login." Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#CCCCCC" LineHeight="23" AutomationProperties.LiveSetting="Polite"/>
                         <ProgressBar x:Name="Progress" Height="3" IsIndeterminate="True" Margin="0,18,0,0"/>
                     </StackPanel>

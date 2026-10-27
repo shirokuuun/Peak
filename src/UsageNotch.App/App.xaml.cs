@@ -30,9 +30,20 @@ public partial class App : Application
     private bool _inspect;
     private bool _demoCycle;
     private bool _firstRun;
+    private bool _resourcePreview;
+
+    // Isolated renderers need the real resources and dispatcher without starting
+    // the tray, provider clients, single-instance recovery, or user preferences.
+    internal static App CreateResourcePreview()
+    {
+        var app = new App { _resourcePreview = true };
+        app.InitializeComponent();
+        return app;
+    }
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        if (_resourcePreview) return;
         base.OnStartup(e);
         _singleInstance = new Mutex(true, "Local\\UsageNotch.SingleInstance", out var first);
         _showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, "Local\\UsageNotch.Show");

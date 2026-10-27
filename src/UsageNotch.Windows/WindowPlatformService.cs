@@ -12,6 +12,7 @@ public sealed class WindowPlatformService : IDisposable
     private HwndSource? _source;
     private IntPtr _handle;
     private bool? _clickThrough;
+    private System.Windows.Rect? _interactionBounds;
     public bool HotkeyAvailable { get; private set; }
     public void SetRecoveryShortcut(string shortcut)
     {
@@ -26,8 +27,15 @@ public sealed class WindowPlatformService : IDisposable
     public bool IsPointerOver()
     {
         if (_handle == IntPtr.Zero || !GetCursorPos(out var point) || !GetWindowRect(_handle, out var rect)) return false;
+        if (_interactionBounds is { } bounds)
+        {
+            var scale = GetDpiForWindow(_handle) / 96d;
+            if (scale <= 0) scale = 1;
+            return bounds.Contains(new System.Windows.Point((point.X - rect.Left) / scale, (point.Y - rect.Top) / scale));
+        }
         return point.X >= rect.Left && point.X < rect.Right && point.Y >= rect.Top && point.Y < rect.Bottom;
     }
+    public void SetInteractionBounds(System.Windows.Rect bounds) => _interactionBounds = bounds;
     public static bool AltHeld => (GetAsyncKeyState(0x12) & 0x8000) != 0;
     public bool SetCaptureExclusion(bool enabled) => _handle != IntPtr.Zero && SetWindowDisplayAffinity(_handle, enabled ? 0x11u : 0u);
     public event EventHandler? HotkeyPressed;
@@ -46,16 +54,16 @@ public sealed class WindowPlatformService : IDisposable
     private static Forms.Screen? Screen(string device) => device == "Primary" ? Forms.Screen.PrimaryScreen :
         Forms.Screen.AllScreens.FirstOrDefault(s => s.DeviceName == device) ?? Forms.Screen.PrimaryScreen;
 
-    public void PositionAtTopCenter(int offset, string monitor = "Primary")
+    public void PositionAtTopCenter(int offset, string monitor = "Primary", bool attachedToTop = false)
     {
         if (_window is null || _handle == IntPtr.Zero || Screen(monitor) is not { } screen) return;
         // Keep coordinates in physical pixels; WPF handles the logical size on WM_DPICHANGED.
         var scale = GetDpiForWindow(_handle) / 96.0;
         if (scale <= 0) scale = 1;
         var width = (int)Math.Round(_window.ActualWidth * scale);
-        var bounds = screen.WorkingArea;
+        var bounds = attachedToTop ? screen.Bounds : screen.WorkingArea;
         SetWindowPos(_handle, IntPtr.Zero, bounds.Left + Math.Max(0, (bounds.Width - width) / 2),
-            bounds.Top + (int)Math.Round(offset * scale), 0, 0, 0x0015); // no size, z-order, or activation
+            bounds.Top + (attachedToTop ? 0 : (int)Math.Round(offset * scale)), 0, 0, 0x0015); // no size, z-order, or activation
     }
 
     public void SetClickThrough(bool enabled)
@@ -85,6 +93,8 @@ public sealed class WindowPlatformService : IDisposable
         { HotkeyPressed?.Invoke(this, EventArgs.Empty); handled = true; }
         if (msg is 0x02E0 or 0x007E) _window?.Dispatcher.BeginInvoke(() => DisplayChanged?.Invoke(this, EventArgs.Empty));
         if (msg == 0x0021) { handled = true; return new IntPtr(3); } // MA_NOACTIVATE
+        if (msg == 0x0084 && _interactionBounds is not null && !IsPointerOver())
+        { handled = true; return new IntPtr(-1); } // HTTRANSPARENT outside the animated surface
         return IntPtr.Zero;
     }
 

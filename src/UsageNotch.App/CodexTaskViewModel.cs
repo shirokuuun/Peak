@@ -16,7 +16,7 @@ public sealed class CodexTaskViewModel : ObservableObject
     {
         CodexTaskState.ApprovalRequested => "Approval requested · review in Codex",
         CodexTaskState.InputRequested => "Question for you · open Codex",
-        CodexTaskState.Working => "Working · hook observed",
+        CodexTaskState.Working => _task.FromHooks ? "Working · hook observed" : "Working · local log",
         CodexTaskState.RecentActivity => "Recent activity · local log",
         CodexTaskState.Idle => "Finished / idle · last observed",
         CodexTaskState.Interrupted => "Interrupted",

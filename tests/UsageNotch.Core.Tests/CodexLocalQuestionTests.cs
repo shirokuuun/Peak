@@ -59,11 +59,11 @@ public sealed class CodexLocalQuestionTests
     public void MatchingAnswerClearsQuestion(string outputType)
     {
         var task = Parse([Lifecycle("task_started", 0), Question(1), Output(2, type: outputType)]);
-        Assert.Equal(CodexTaskState.RecentActivity, task.State);
+        Assert.Equal(CodexTaskState.Working, task.State);
         Assert.False(task.NeedsAttention);
         Assert.Null(task.AttentionKey);
         Assert.Equal("Answer received · local log", task.Activity);
-        Assert.False(TaskActivitySummary.Select([task], At.AddSeconds(10)).IsVisible);
+        Assert.Equal(IslandActivityKind.Working, TaskActivitySummary.Select([task], At.AddSeconds(10)).Kind);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class CodexLocalQuestionTests
     [Theory]
     [InlineData("task_complete", CodexTaskState.Idle)]
     [InlineData("turn_aborted", CodexTaskState.Interrupted)]
-    [InlineData("task_started", CodexTaskState.RecentActivity)]
+    [InlineData("task_started", CodexTaskState.Working)]
     public void TurnLifecycleClearsQuestion(string type, CodexTaskState state)
     {
         var task = Parse([Lifecycle("task_started", 0), Question(1), Lifecycle(type, 2)]);
@@ -111,7 +111,7 @@ public sealed class CodexLocalQuestionTests
         var task = Parse(["partial-json", Lifecycle("task_started", 0),
             Question(1, name: "request_permissions"), Question(2, name: "request_user_input_async"),
             Question(3, callId: ""), Question(200)]);
-        Assert.Equal(CodexTaskState.RecentActivity, task.State);
+        Assert.Equal(CodexTaskState.Working, task.State);
         Assert.False(task.NeedsAttention);
     }
 
@@ -153,7 +153,7 @@ public sealed class CodexLocalQuestionTests
         await changed.Task.WaitAsync(TimeSpan.FromSeconds(5));
         var after = Assert.Single((await monitor.ReadAsync(default)).Tasks);
         Assert.False(after.NeedsAttention);
-        Assert.Equal(CodexTaskState.RecentActivity, after.State);
+        Assert.Equal(CodexTaskState.Working, after.State);
     }
 
     [Theory]

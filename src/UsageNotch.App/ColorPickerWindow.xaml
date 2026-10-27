@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Peak color" Icon="Assets/Notch.ico" Width="410" Height="750"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="True"
-        Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}">
+        Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextBrush}"
+        Style="{StaticResource PeakWindowStyle}">
     <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="SettingsStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
     <Grid Margin="22">
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="0,0,8,8">
-                <TextBlock Text="Make Peak yours" FontSize="23" FontWeight="SemiBold"/>
+                <TextBlock Text="Make Peak yours" FontSize="23" FontWeight="Bold"/>
                 <TextBlock Text="Pick any color. Text adjusts automatically." Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,16"/>
                 <Grid x:Name="ColorField" Height="136" ClipToBounds="True" Cursor="Cross"
                       MouseLeftButtonDown="OnPaletteDown" MouseMove="OnPaletteMove" MouseLeftButtonUp="OnPaletteUp" SizeChanged="OnPaletteSizeChanged"
@@ -50,7 +51,7 @@
                 <TextBlock Text="Color preview" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,0,7"/>
                 <Border x:Name="PreviewSurface" CornerRadius="18" Padding="15" BorderThickness="1">
                     <StackPanel>
-                        <Grid><TextBlock x:Name="PreviewTitle" Text="Peak" FontSize="15" FontWeight="SemiBold"/><TextBlock x:Name="PreviewValue" Text="68% remaining · sample" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid>
+                        <Grid><TextBlock x:Name="PreviewTitle" Text="Peak" FontSize="15" FontWeight="Bold"/><TextBlock x:Name="PreviewValue" Text="68% remaining · sample" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid>
                         <Border x:Name="PreviewCard" CornerRadius="9" Padding="10" Margin="0,12,0,0">
                             <StackPanel>
                                 <TextBlock x:Name="PreviewSecondary" Text="Next reset in 2h 18m" FontSize="11"/>

@@ -32,6 +32,10 @@ $peakVersion = (Get-Item -LiteralPath (Join-Path $peakPublished 'Peak.exe')).Ver
 if ($peakVersion -notmatch '^(\d+)\.(\d+)\.(\d+)$') { throw 'A semantic application version is required.' }
 # The Store reserves the fourth component; increment the third for subsequent submissions.
 $peakPackageVersion = "$peakVersion.0"
+[xml]$peakManifest = Get-Content -LiteralPath (Join-Path $peakRoot 'store/AppxManifest.xml') -Raw
+if ($peakManifest.Package.Identity.Version -ne $peakPackageVersion -or $peakFlavor.version -ne $peakVersion) {
+    throw 'The published Store version does not match its manifest. Rebuild with publish.ps1 -StoreBuild.'
+}
 $peakOutput = Join-Path $peakRoot 'artifacts/store'
 New-Item -ItemType Directory -Force -Path $peakOutput | Out-Null
 $peakPackage = Join-Path $peakOutput "Peak-$peakPackageVersion-Windows-x64-Store.msix"
@@ -40,7 +44,6 @@ $peakStage = Join-Path $peakRoot ('.research/store-staging-' + [Guid]::NewGuid()
 New-Item -ItemType Directory -Path $peakStage | Out-Null
 Copy-Item -Path (Join-Path $peakPublished '*') -Destination $peakStage -Recurse
 Copy-Item -LiteralPath (Join-Path $peakRoot 'store/Assets') -Destination $peakStage -Recurse
-[xml]$peakManifest = Get-Content -LiteralPath (Join-Path $peakRoot 'store/AppxManifest.xml')
 $peakIdentity = Get-Content -LiteralPath (Join-Path $peakRoot 'store/identity.json') -Raw | ConvertFrom-Json
 $peakManifest.Package.Identity.Name = $peakIdentity.name
 $peakManifest.Package.Identity.Publisher = $peakIdentity.publisher
@@ -82,10 +85,12 @@ $peakSha256 = (Get-FileHash -LiteralPath $peakPackage -Algorithm SHA256).Hash.To
 [IO.File]::WriteAllText(($peakPackage + '.sha256'), "$peakSha256  $([IO.Path]::GetFileName($peakPackage))`n", [Text.UTF8Encoding]::new($false))
 $peakMetadata = [ordered]@{
     version = $peakPackageVersion; architecture = 'x64'; identity = $peakIdentity
+    developmentVersion = $peakFlavor.developmentVersion
     package = [IO.Path]::GetFileName($peakPackage); sha256 = $peakSha256
     signed = $false; target = 'Partner Center MSIX submission'; publicDownload = $false
     stageDirectory = $peakStage; builtAt = (Get-Date).ToUniversalTime().ToString('O')
 }
 [IO.File]::WriteAllText((Join-Path $peakOutput 'package.json'), ($peakMetadata | ConvertTo-Json -Depth 5) + "`n", [Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText(([IO.Path]::ChangeExtension($peakPackage, '.json')), ($peakMetadata | ConvertTo-Json -Depth 5) + "`n", [Text.UTF8Encoding]::new($false))
 Write-Output "Partner Center upload ready: $peakPackage"
 Write-Output "SHA-256: $peakSha256"

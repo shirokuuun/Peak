@@ -9,6 +9,7 @@ internal sealed class PolicyWindow : Window
 {
     public PolicyWindow(string title, string file)
     {
+        Style = (Style)Application.Current.FindResource("PeakWindowStyle");
         Title = "Peak · " + title; Width = 720; Height = 620;
         MinWidth = 500; MinHeight = 400; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Background = new SolidColorBrush(Color.FromRgb(22, 22, 22));

@@ -73,9 +73,10 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
         }
         var tasks = new Dictionary<string, CodexTask>();
         var readPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var localFiles = Enumerable.Range(-1, 8).Select(offset => Path.Combine(_codexRoot, "sessions",
-                now.UtcDateTime.AddDays(-offset).ToString("yyyy/MM/dd"))).Where(Directory.Exists)
-            .SelectMany(directory => Directory.EnumerateFiles(directory, "*.jsonl"))
+        // Resumed chats keep their original date folder. Select recent writes across all folders,
+        // then read bounded tails from only the newest files.
+        var sessionsRoot = Path.Combine(_codexRoot, "sessions");
+        var localFiles = (Directory.Exists(sessionsRoot) ? Directory.EnumerateFiles(sessionsRoot, "*.jsonl", SearchOption.AllDirectories) : [])
             .Select(path => new FileInfo(path)).OrderByDescending(file => file.LastWriteTimeUtc).Take(16);
         foreach (var file in localFiles)
         {
@@ -115,8 +116,8 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
         foreach (var key in _tails.Keys.Where(key => !readPaths.Contains(key)).ToArray()) _tails.Remove(key);
         var ordered = tasks.Values.OrderByDescending(t => t.NeedsAttention).ThenByDescending(t => t.State == CodexTaskState.Working)
             .ThenByDescending(t => t.ObservedAt).Take(8).ToArray();
-        var status = hookTaskCount == 0 ? "Local questions and activity · approval monitoring needs setup in Settings" :
-            "Hook observations and local questions · approvals are reviewed in Codex";
+        var status = hookTaskCount == 0 ? "Local work and questions · approval monitoring needs setup in Settings" :
+            "Hook observations and local work · approvals are reviewed in Codex";
         return new(ordered, status, now);
     }
 
@@ -128,8 +129,10 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
         var localCompletion = local.ObservedAt > observed.ObservedAt &&
             (local.State is CodexTaskState.Idle or CodexTaskState.Interrupted ||
              observed.State == CodexTaskState.InputRequested && local.Activity == "Answer received · local log");
-        return localQuestion || localCompletion ? observed with { State = local.State, Activity = local.Activity,
-            ObservedAt = local.ObservedAt, StartedAt = local.StartedAt ?? observed.StartedAt,
+        var localWork = local.State == CodexTaskState.Working && local.ObservedAt > observed.ObservedAt &&
+            (!observed.NeedsAttention || local.StartedAt > observed.ObservedAt);
+        return localQuestion || localCompletion || localWork ? observed with { State = local.State, Activity = local.Activity,
+            ObservedAt = local.ObservedAt, StartedAt = localWork ? local.StartedAt : local.StartedAt ?? observed.StartedAt,
             AttentionKey = local.AttentionKey, FromHooks = false } : observed;
     }
 
@@ -138,6 +141,8 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
         DateTimeOffset? lastAt = null;
         DateTimeOffset? startedAt = null;
         string? turn = null;
+        var working = false;
+        var turnEnded = false;
         var pending = new HashSet<string>(StringComparer.Ordinal);
         var state = CodexTaskState.RecentActivity;
         var activity = "Local activity · approval status unavailable";
@@ -147,31 +152,44 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
             if (e is null || e.ObservedAt > now.AddMinutes(2)) continue;
             if (e.Type == "task_started")
             {
-                turn = e.TurnId; startedAt = e.ObservedAt; pending.Clear();
-                state = CodexTaskState.RecentActivity; activity = "Turn started · local log";
+                turn = e.TurnId; startedAt = e.ObservedAt; pending.Clear(); working = true; turnEnded = false;
+                state = CodexTaskState.Working; activity = "Working on your request · local log";
             }
             else if (turn is not null && e.TurnId is not null && turn != e.TurnId) continue;
             else if (e.Type is "task_complete" or "turn_aborted")
             {
                 pending.Clear();
+                turn ??= e.TurnId; working = false; turnEnded = true;
                 state = e.Type == "task_complete" ? CodexTaskState.Idle : CodexTaskState.Interrupted;
                 activity = e.Type == "task_complete" ? "Response finished · local log" : "Interrupted · local log";
             }
             else if (e.Type == "input_requested")
             {
+                if (turnEnded) continue;
                 pending.Add(e.OperationKey!); state = CodexTaskState.InputRequested; activity = "Question for you · local log";
             }
             else if (e.Type == "input_resolved")
             {
                 // Other tool results must neither dismiss a question nor refresh its observation age.
                 if (!pending.Remove(e.OperationKey!)) continue;
-                state = pending.Count > 0 ? CodexTaskState.InputRequested : CodexTaskState.RecentActivity;
+                state = pending.Count > 0 ? CodexTaskState.InputRequested : working ? CodexTaskState.Working : CodexTaskState.RecentActivity;
                 activity = pending.Count > 0 ? "Question for you · local log" : "Answer received · local log";
+            }
+            else
+            {
+                // Late tool results must not reopen an ended turn or renew a pending question.
+                if (turnEnded || pending.Count > 0) continue;
+                if (e.Type == "turn_activity")
+                {
+                    // Fresh model activity with a turn id remains useful when the turn start is outside the tail.
+                    turn ??= e.TurnId; working = true; state = CodexTaskState.Working;
+                    activity = e.WorkKind == "thinking" ? "Thinking · local log" : "Working on your request · local log";
+                }
             }
             lastAt = e.ObservedAt;
         }
         if (lastAt is null) return null;
-        if (state is CodexTaskState.RecentActivity or CodexTaskState.InputRequested && now - lastAt > TimeSpan.FromMinutes(5))
+        if (state is CodexTaskState.RecentActivity or CodexTaskState.Working or CodexTaskState.InputRequested && now - lastAt > TimeSpan.FromMinutes(5))
             state = CodexTaskState.Stale;
         var attentionKey = pending.Count == 0 ? null : string.Join(",", pending.Order(StringComparer.Ordinal).Select(key => turn + "|" + key));
         return new(id, title, project, state, activity, lastAt.Value, false, attentionKey, StartedAt: startedAt);
@@ -205,10 +223,11 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
     {
         var e = ParseLocalEvent(line);
         return e is null ? null : JsonSerializer.Serialize(new { timestamp = e.ObservedAt,
-            type = "event_msg", payload = new { type = e.Type, turn_id = e.TurnId, operation_key = e.OperationKey } });
+            type = "event_msg", payload = new { type = e.Type, turn_id = e.TurnId, operation_key = e.OperationKey, work_kind = e.WorkKind } });
     }
 
-    private sealed record LocalTaskEvent(string Type, DateTimeOffset ObservedAt, string? TurnId = null, string? OperationKey = null);
+    private sealed record LocalTaskEvent(string Type, DateTimeOffset ObservedAt, string? TurnId = null, string? OperationKey = null,
+        string? WorkKind = null);
 
     private static LocalTaskEvent? ParseLocalEvent(string line)
     {
@@ -222,8 +241,20 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
             var type = CodexUsageMapper.GetString(payload, "type");
             if (CodexUsageMapper.GetString(root, "type") == "event_msg")
             {
+                var turnId = CodexUsageMapper.GetString(payload, "turn_id");
+                if (!string.IsNullOrWhiteSpace(turnId) && turnId.Length <= 256)
+                {
+                    if (type == "item_completed" && payload.TryGetProperty("item", out var item) && item.ValueKind == JsonValueKind.Object)
+                    {
+                        var itemType = CodexUsageMapper.GetString(item, "type");
+                        if (itemType is "Reasoning" or "AgentMessage")
+                            return new("turn_activity", at, turnId, WorkKind: itemType == "Reasoning" ? "thinking" : "working");
+                    }
+                    if (type == "turn_activity" && CodexUsageMapper.GetString(payload, "work_kind") is "thinking" or "working")
+                        return new(type, at, turnId, WorkKind: CodexUsageMapper.GetString(payload, "work_kind"));
+                }
                 if (type is "task_started" or "task_complete" or "turn_aborted" or "item_completed" or "token_count")
-                    return new(type, at, CodexUsageMapper.GetString(payload, "turn_id"));
+                    return new(type, at, turnId);
                 // The cache stores only these normalized question events, never arguments or answers.
                 if (type is "input_requested" or "input_resolved" &&
                     CodexUsageMapper.GetString(payload, "operation_key") is { Length: 24 } key && key.All(Uri.IsHexDigit))

@@ -73,6 +73,64 @@ public sealed class CodexTaskTests
         Assert.Equal(CodexTaskEvents.Parse(first.RootElement, At)!.OperationKey, CodexTaskEvents.Parse(second.RootElement, At)!.OperationKey);
     }
 
+    [Theory]
+    [InlineData("Bash")]
+    [InlineData("apply_patch")]
+    public void ApprovalDescriptionDoesNotPreventMatchingToolCompletion(string tool)
+    {
+        CodexTaskEvent Parse(string name, int second, object args)
+        {
+            using var input = JsonDocument.Parse(JsonSerializer.Serialize(new { session_id = Id, turn_id = "turn1",
+                hook_event_name = name, tool_name = tool, tool_input = args }));
+            return CodexTaskEvents.Parse(input.RootElement, At.AddSeconds(second))!;
+        }
+        var before = Parse("PreToolUse", 0, new { command = "PRIVATE-COMMAND" });
+        var request = Parse("PermissionRequest", 1, new { command = "PRIVATE-COMMAND", description = "PRIVATE-REASON" });
+        var completion = Parse("PostToolUse", 2, new { command = "PRIVATE-COMMAND", description = (string?)null });
+
+        Assert.Equal(before.OperationKey, request.OperationKey);
+        Assert.Equal(request.OperationKey, completion.OperationKey);
+        var waiting = CodexTaskEvents.Reduce([before, request], "Chat", At.AddSeconds(2));
+        Assert.True(waiting.NeedsAttention);
+        var finished = CodexTaskEvents.Reduce([before, request, completion], "Chat", At.AddSeconds(3));
+        Assert.Equal(CodexTaskState.Working, finished.State);
+        Assert.False(finished.NeedsAttention);
+        Assert.Null(finished.AttentionKey);
+        Assert.DoesNotContain("PRIVATE", JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData("Bash", "first command", "second command", "same reason", "same reason")]
+    [InlineData("mcp__example__run", "same command", "same command", "first argument", "second argument")]
+    public void DistinctOperationsKeepSeparateFingerprints(string tool, string firstCommand, string secondCommand,
+        string firstDescription, string secondDescription)
+    {
+        CodexTaskEvent Parse(string command, string description)
+        {
+            using var input = JsonDocument.Parse(JsonSerializer.Serialize(new { session_id = Id,
+                hook_event_name = "PermissionRequest", tool_name = tool, tool_input = new { command, description } }));
+            return CodexTaskEvents.Parse(input.RootElement, At)!;
+        }
+        Assert.NotEqual(Parse(firstCommand, firstDescription).OperationKey, Parse(secondCommand, secondDescription).OperationKey);
+    }
+
+    [Fact] public void UnrelatedActivityDoesNotKeepAnOldApprovalAlive()
+    {
+        var task = CodexTaskEvents.Reduce([Event("PermissionRequest", 0), Event("PreToolUse", 300, "other"),
+            Event("PostToolUse", 301, "other")], "Chat", At.AddSeconds(302));
+        Assert.Equal(CodexTaskState.Working, task.State);
+        Assert.False(task.NeedsAttention);
+        Assert.Null(task.AttentionKey);
+    }
+
+    [Fact] public void ExpiringOneRequestPreservesAnotherFreshRequest()
+    {
+        var task = CodexTaskEvents.Reduce([Event("PermissionRequest", 0), Event("PermissionRequest", 300, "other")],
+            "Chat", At.AddSeconds(302));
+        Assert.Equal(CodexTaskState.ApprovalRequested, task.State);
+        Assert.Equal("turn1|other", task.AttentionKey);
+    }
+
     [Fact] public void LocalLogActivityNeverFabricatesAnApprovalOrUsesToolContents()
     {
         var lines = new[] { "partial-json", JsonSerializer.Serialize(new { timestamp = At,
@@ -81,7 +139,7 @@ public sealed class CodexTaskTests
                 payload = new { type = "custom_tool_call", name = "request_permissions", input = "PRIVATE" } }) };
         var task = CodexTaskMonitor.ParseLocal(Id, "Chat", "notch", lines, At.AddSeconds(2));
         Assert.NotNull(task);
-        Assert.Equal(CodexTaskState.RecentActivity, task.State);
+        Assert.Equal(CodexTaskState.Working, task.State);
         Assert.False(task.NeedsAttention);
         Assert.DoesNotContain("PRIVATE", JsonSerializer.Serialize(task));
     }

@@ -4,7 +4,7 @@ Policy version 1.1 · October 6, 2026
 
 ## Independent product
 
-Peak is an independent Windows utility. OpenAI, Codex, Claude, Anthropic, Microsoft, and Windows names identify their respective products and services. Peak does not claim affiliation or endorsement. Provider identification in this website uses plain text and abbreviations.
+Peak is an independent Windows utility. OpenAI, Codex, Claude, Anthropic, Microsoft, and Windows names identify their respective products and services. Peak does not claim affiliation or endorsement. The desktop notch uses supplied Codex and Claude images to identify the providers; provider names and marks belong to their respective owners.
 
 ## Desktop application components
 
@@ -16,6 +16,12 @@ Official release packages include the applicable full license texts and generate
 - [Windows Community Toolkit](https://github.com/CommunityToolkit/WindowsCommunityToolkit)
 - [Windows SDK license](https://aka.ms/WinSDKLicenseURL)
 - [Windows Runtime interop](https://github.com/microsoft/CsWinRT)
+
+## Desktop font
+
+Peak embeds the unmodified Inter 4.1 Medium, SemiBold, and Bold fonts by Rasmus Andersson, licensed under the SIL Open Font License 1.1. The full copyright and license notice is included in `licenses/Inter-OFL.txt`.
+
+- [Inter](https://github.com/rsms/inter/releases/tag/v4.1)
 
 ## Installed provider tools
 

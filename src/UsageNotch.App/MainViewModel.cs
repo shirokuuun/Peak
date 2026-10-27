@@ -57,11 +57,12 @@ public sealed class MainViewModel : ObservableObject, IAsyncDisposable
     public bool HasIslandActivity => _island.IsVisible;
     public TaskActivitySummary IslandActivity => _island;
     public string RecoveryHint => "Click to pin details. " + NotchPresence.ShortcutLabel(Settings.RecoveryShortcut) + " reveals Peak.";
-    public double IslandHeaderHeight => HasIslandActivity ? 78 : 42;
-    public double IslandWidth => HasIslandActivity ? 600 : 360;
-    public Visibility IslandActivityVisibility => HasIslandActivity ? Visibility.Visible : Visibility.Collapsed;
+    private NotchLayout Layout => NotchLayout.Calculate(Settings, _expanded, HasIslandActivity);
+    public double IslandHeaderHeight => Layout.HeaderHeight;
+    public double IslandWidth => Layout.Width;
+    public Visibility IslandActivityVisibility => Layout.ShowActivity ? Visibility.Visible : Visibility.Collapsed;
     public Visibility IslandProgressVisibility => _island.Kind == IslandActivityKind.Working ? Visibility.Visible : Visibility.Hidden;
-    public bool IsIslandAnimating => _island.Kind == IslandActivityKind.Working && !IsSuspended && SystemParameters.ClientAreaAnimation;
+    public bool IsIslandAnimating => Layout.ShowActivity && _island.Kind == IslandActivityKind.Working && !IsSuspended && SystemParameters.ClientAreaAnimation;
     public string IslandOtherTasks => _island.OtherActiveCount > 0 ? $"+{_island.OtherActiveCount}" : "";
     public Brush IslandActivityBrush => _island.Kind switch
     {
@@ -155,7 +156,7 @@ public sealed class MainViewModel : ObservableObject, IAsyncDisposable
     }
 
     public void SetExpanded(bool expanded)
-    { _expanded = expanded; UpdateClockInterval(); }
+    { _expanded = expanded; RefreshIslandPresentation(); }
     private void UpdateClockInterval() => _clock.Interval = TimeSpan.FromSeconds(_expanded || HasIslandActivity ? 1 : 15);
     public void SelectTasks(bool selected)
     {

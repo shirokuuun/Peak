@@ -104,6 +104,42 @@ public sealed class NotchPresenceTests
         Assert.Equal(0, Show(settings with { PointerOpacityPercent = 0 }, pointer: true).Opacity);
     }
 
+    [Theory]
+    [InlineData(CodexTaskState.ApprovalRequested, 0)]
+    [InlineData(CodexTaskState.ApprovalRequested, 25)]
+    [InlineData(CodexTaskState.InputRequested, 0)]
+    [InlineData(CodexTaskState.InputRequested, 25)]
+    public void AttentionRespectsPointerFadingAndRestoresWhenPointerLeaves(CodexTaskState state, int opacity)
+    {
+        var settings = new AppSettings { PresenceMode = "Active", FadeUnderPointer = true, PointerOpacityPercent = opacity };
+        var attention = Activity(IslandActivityKind.Attention);
+        attention = attention with { Task = attention.Task! with { State = state } };
+        var faded = Show(settings, attention, pointer: true);
+        Assert.True(faded.Visible);
+        Assert.Equal(opacity / 100d, faded.Opacity);
+        Assert.True(faded.ClickThrough);
+        var restored = Show(settings, attention);
+        Assert.True(restored.Visible);
+        Assert.Equal(1, restored.Opacity);
+        Assert.False(restored.ClickThrough);
+        var disabled = Show(settings with { FadeUnderPointer = false }, attention, pointer: true);
+        Assert.Equal(1, disabled.Opacity);
+        Assert.False(disabled.ClickThrough);
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void PinnedDetailsAndAltPeekKeepAttentionReadable(bool pinned, bool alt)
+    {
+        var settings = new AppSettings { PresenceMode = "Active", FadeUnderPointer = true,
+            PointerOpacityPercent = 0, ClickThrough = true };
+        var shown = Show(settings, Activity(IslandActivityKind.Attention), pointer: true, pinned: pinned, alt: alt);
+        Assert.True(shown.Visible);
+        Assert.Equal(1, shown.Opacity);
+        Assert.False(shown.ClickThrough);
+    }
+
     [Fact]
     public void AltPeekAndHoverModeRemainReadableAndInteractive()
     {

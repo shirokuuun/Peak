@@ -55,8 +55,12 @@ public static class CodexTaskEvents
         if (tool is not null && input.TryGetProperty("tool_input", out var args))
         {
             // Inputs can contain secrets. Only a fingerprint used to match completion is retained.
+            // Codex adds approval-only metadata (such as description) to shell/patch requests.
+            // Their command is the shared identity across PreToolUse, PermissionRequest and PostToolUse.
+            var identity = (tool is "Bash" or "apply_patch") && args.ValueKind == JsonValueKind.Object &&
+                args.TryGetProperty("command", out var command) && command.ValueKind == JsonValueKind.String ? command : args;
             using var buffer = new MemoryStream();
-            using (var writer = new Utf8JsonWriter(buffer)) Canonical(writer, args);
+            using (var writer = new Utf8JsonWriter(buffer)) Canonical(writer, identity);
             operation = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(tool).Concat(buffer.ToArray()).ToArray()))[..24];
         }
         return new(1, id!, String(input, "turn_id"), name, now, project[..Math.Min(80, project.Length)], tool, operation);
@@ -71,7 +75,7 @@ public static class CodexTaskEvents
         string? turn = null;
         DateTimeOffset? startedAt = null;
         var state = CodexTaskState.Unknown;
-        var pending = new Dictionary<string, CodexTaskState>();
+        var pending = new Dictionary<string, (CodexTaskState State, DateTimeOffset RequestedAt)>();
         var running = new HashSet<string>();
         string activity = "";
         foreach (var e in events)
@@ -88,11 +92,11 @@ public static class CodexTaskEvents
                 case "PreToolUse":
                     running.Add(key);
                     if (e.ToolName?.Contains("request_user_input", StringComparison.OrdinalIgnoreCase) == true)
-                        pending[key] = CodexTaskState.InputRequested;
+                        pending[key] = (CodexTaskState.InputRequested, e.ObservedAt);
                     state = CodexTaskState.Working; activity = ToolLabel(e.ToolName); break;
                 case "PermissionRequest":
-                    pending[key] = CodexTaskState.ApprovalRequested;
-                    activity = ToolLabel(e.ToolName); break;
+                    pending[key] = (CodexTaskState.ApprovalRequested, e.ObservedAt);
+                    state = CodexTaskState.Working; activity = ToolLabel(e.ToolName); break;
                 case "PostToolUse":
                     pending.Remove(key); running.Remove(key);
                     state = CodexTaskState.Working; activity = running.Count > 0 ? "Tools running" : "Working on the next step"; break;
@@ -101,7 +105,10 @@ public static class CodexTaskEvents
                 case "SessionEnd": state = CodexTaskState.Idle; pending.Clear(); running.Clear(); activity = "Session closed"; break;
             }
         }
-        if (pending.Count > 0) state = pending.Values.Contains(CodexTaskState.ApprovalRequested)
+        // Unrelated tool activity cannot extend the lifetime of an unanswered observation.
+        foreach (var key in pending.Where(item => now - item.Value.RequestedAt > TimeSpan.FromMinutes(5)).Select(item => item.Key).ToArray())
+            pending.Remove(key);
+        if (pending.Count > 0) state = pending.Values.Any(item => item.State == CodexTaskState.ApprovalRequested)
             ? CodexTaskState.ApprovalRequested : CodexTaskState.InputRequested;
         if (now - last.ObservedAt > TimeSpan.FromMinutes(5) && state is CodexTaskState.Working or CodexTaskState.ApprovalRequested or CodexTaskState.InputRequested)
             state = CodexTaskState.Stale;

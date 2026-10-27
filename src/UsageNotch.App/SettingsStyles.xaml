@@ -15,7 +15,7 @@
         <Setter Property="Margin" Value="0,0,0,12"/>
     </Style>
     <Style x:Key="CardTitle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="TextWrapping" Value="Wrap"/><Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
     </Style>
     <Style x:Key="Description" TargetType="TextBlock">
@@ -24,6 +24,7 @@
         <Setter Property="Margin" Value="0,5,0,0"/>
     </Style>
     <Style TargetType="Button">
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource TextBrush}"/><Setter Property="Background" Value="{StaticResource TrackBrush}"/>
         <Setter Property="Padding" Value="14,9"/><Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
