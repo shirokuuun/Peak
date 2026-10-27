@@ -1,5 +1,28 @@
 # Peak Store candidate verification
 
+## 1.0.3
+
+Checked October 28, 2026 (Asia/Manila).
+
+Not yet released on Microsoft Store. Prepared for upload after Store 1.0.2, using all changes through development 1.0.5. Source commit: `72bf080737b3b83c39c324df363d8162275e0fae`.
+
+Candidate: `Peak-1.0.3.0-Windows-x64-Store.msix`, 119,311,845 bytes.
+
+SHA-256: `f52e3ea12fe9fb81a517a7ec8a6f3d420a844598ac5de4f8f36b05780c7e1507`
+
+- Development and Store configurations each passed all 191 tests, without skips. The development Release build and self-contained Store publication completed without warnings or errors.
+- Development stays at 1.0.5 in the app project. Store publication reads 1.0.3.0 from the manifest and applies version 1.0.3 to the executable, app assemblies and bridge. The build marker and versioned package metadata record development 1.0.5 as the source of its changes.
+- All eight app/bridge project binaries report product version 1.0.3. The published Core assembly reports the Store flavor and assembly version 1.0.3.0; the app and bridge contain identical Core bytes.
+- MakeAppx packaged and semantically validated the manifest. Identity, publisher, version and x64 architecture were checked again inside the finished package. MakePri generated and validated the image resource index, including all scaled assets and their manifest keys.
+- All 700 payload files match their staging bytes. Nine license files include the Inter font license. The package contains no personal settings, credentials, observation logs, debug symbols or signing keys, and has no signing signature.
+- The final SHA-256 matches both package metadata and its checksum sidecar. The original 1.0.2.0 package remains unchanged, with its previous recorded SHA-256.
+- Packaging rejects the older 1.0.5 publication when it does not match the Store manifest. Existing package files are preserved rather than overwritten.
+- The 1.0.5 opening, closing, rapid-reversal and notch-style previews were inspected before this Store rebuild. The staged source scan reported no secret findings before its GitHub push.
+
+Upload artifact: `artifacts/store/Peak-1.0.3.0-Windows-x64-Store.msix`. Build folder: `dist/store/Peak-1.0.3`. The upload, Microsoft signing and certification have not occurred. This check did not repeat the earlier isolated package integration fixture, run Windows App Certification Kit, or perform fresh install/update/uninstall and live-provider sign-in testing. Those interactive and certification checks remain required before release.
+
+## Previous 1.0.2 candidate
+
 Checked October 7, 2026 on Windows 11 build 26200 with .NET SDK 10.0.401 and Windows SDK tools 10.0.19041.0.
 
 Candidate: `Peak-1.0.2.0-Windows-x64-Store.msix`, 118,592,703 bytes.

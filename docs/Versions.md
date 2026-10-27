@@ -12,6 +12,7 @@ Not yet released on Microsoft Store.
 - Includes all development changes through 1.0.5: resolved approval alerts, hover fading, VS Code activity detection, Inter typography, supplied provider images, borderless transitions, and both notch styles.
 - Upload package: `artifacts/store/Peak-1.0.3.0-Windows-x64-Store.msix`.
 - Preparing an upload does not mark the development builds as separately released on Microsoft Store.
+- Verification: all 191 tests passed in each build configuration; Windows SDK package validation passed and all 700 payload files match the staging build. See [Store verification](Store-verification.md).
 
 ## Development 1.0.5
 
