@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using Forms = System.Windows.Forms;
 
 namespace UsageNotch.Windows;
@@ -13,6 +14,7 @@ public sealed class WindowPlatformService : IDisposable
     private IntPtr _handle;
     private bool? _clickThrough;
     private System.Windows.Rect? _interactionBounds;
+    private Geometry? _interactionGeometry;
     public bool HotkeyAvailable { get; private set; }
     public void SetRecoveryShortcut(string shortcut)
     {
@@ -31,11 +33,13 @@ public sealed class WindowPlatformService : IDisposable
         {
             var scale = GetDpiForWindow(_handle) / 96d;
             if (scale <= 0) scale = 1;
-            return bounds.Contains(new System.Windows.Point((point.X - rect.Left) / scale, (point.Y - rect.Top) / scale));
+            var local = new System.Windows.Point((point.X - rect.Left) / scale, (point.Y - rect.Top) / scale);
+            return bounds.Contains(local) && (_interactionGeometry?.FillContains(local) ?? true);
         }
         return point.X >= rect.Left && point.X < rect.Right && point.Y >= rect.Top && point.Y < rect.Bottom;
     }
-    public void SetInteractionBounds(System.Windows.Rect bounds) => _interactionBounds = bounds;
+    public void SetInteractionBounds(System.Windows.Rect bounds, Geometry? geometry = null)
+    { _interactionBounds = bounds; _interactionGeometry = geometry; }
     public static bool AltHeld => (GetAsyncKeyState(0x12) & 0x8000) != 0;
     public bool SetCaptureExclusion(bool enabled) => _handle != IntPtr.Zero && SetWindowDisplayAffinity(_handle, enabled ? 0x11u : 0u);
     public event EventHandler? HotkeyPressed;

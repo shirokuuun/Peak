@@ -155,8 +155,7 @@ public partial class SettingsWindow : Window
     private void UpdateMiniPreview()
     {
         MiniNotch.Background = (System.Windows.Media.Brush)Application.Current.Resources["SurfaceBrush"];
-        MiniNotch.BorderBrush = (System.Windows.Media.Brush)Application.Current.Resources["CardBorderBrush"];
-        MiniNotch.CornerRadius = Choice(NotchStyleChoices, "DynamicIsland") == "FixedNotch" ? new CornerRadius(0, 0, 12, 12) : new CornerRadius(18);
+        MiniNotch.AttachedToTop = Choice(NotchStyleChoices, "DynamicIsland") == "FixedNotch";
         var text = (System.Windows.Media.Brush)Application.Current.Resources["TextBrush"];
         MiniTitle.Foreground = MiniCodex.Foreground = MiniClaude.Foreground = text;
     }

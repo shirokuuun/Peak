@@ -14,7 +14,7 @@ Open the current draft → Packages and upload:
 
 `D:\Languages\codex\notch\artifacts\store\Peak-1.0.4.0-Windows-x64-Store.msix`
 
-Version **1.0.4** is the next Store update after **1.0.3** and includes the current **development 1.0.6** changes. Not yet released on Microsoft Store. The Store and development version numbers advance independently.
+Version **1.0.4** is the next Store update after **1.0.3** and includes the **development 1.0.6** VS Code fix at the source snapshot in [Store verification](Store-verification.md). The later curved screen-attachment refinement is currently part of development 1.0.6 only. Not yet released on Microsoft Store. The Store and development version numbers advance independently.
 
 This x64 package includes the runtime, Claude/task bridge, policy bundle 1.1, licenses, Start-menu assets, notification registration and an optional Windows startup task. It starts with providers and startup disabled. It is intentionally unsigned for Partner Center ingestion. Microsoft signs Store-distributed MSIX packages after certification. Do not offer this unsigned upload as a public website download.
 

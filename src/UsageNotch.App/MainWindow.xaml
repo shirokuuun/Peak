@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:UsageNotch.App"
-        Title="Peak" Icon="Assets/Notch.ico" Width="600" Height="560" MinWidth="600" MinHeight="560" MaxWidth="600" MaxHeight="560"
+        Title="Peak" Icon="Assets/Notch.ico" Width="{x:Static local:NotchSurface.HostWidth}" Height="560"
+        MinWidth="{x:Static local:NotchSurface.HostWidth}" MinHeight="560" MaxWidth="{x:Static local:NotchSurface.HostWidth}" MaxHeight="560"
         AllowsTransparency="True" Background="Transparent" WindowStyle="None" ResizeMode="NoResize"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" SnapsToDevicePixels="True" UseLayoutRounding="True"
         Style="{StaticResource PeakWindowStyle}" FontWeight="SemiBold"
@@ -76,8 +77,8 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <local:NotchSurface x:Name="Surface" Width="600" Height="560" Background="{DynamicResource SurfaceBrush}">
-      <Grid x:Name="SurfaceLayout" Height="560" VerticalAlignment="Top">
+    <local:NotchSurface x:Name="Surface" Width="{x:Static local:NotchSurface.HostWidth}" Height="560" Background="{DynamicResource SurfaceBrush}">
+      <Grid x:Name="SurfaceLayout" Width="{x:Static local:NotchSurface.ContentWidth}" Height="560" HorizontalAlignment="Center" VerticalAlignment="Top">
         <Border Background="{DynamicResource SurfaceBrush}">
             <Grid>
                 <Grid.RowDefinitions><RowDefinition Height="{Binding IslandHeaderHeight}"/><RowDefinition Height="*"/></Grid.RowDefinitions>

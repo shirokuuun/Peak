@@ -20,12 +20,15 @@ Not yet released on Microsoft Store.
 
 Not yet released on Microsoft Store.
 
+- Fixed Notch now has outward-curving shoulders that merge into the screen's top edge, including its expanded view and Appearance preview. The content area keeps its original width.
+- Transparent space around the curved edges lets clicks pass through. The opening animation still uses a stable host window.
+- This appearance refinement was added after the Store 1.0.4 candidate was built; the existing Store package is the earlier source snapshot recorded in its verification notes.
 - VS Code task detection supports its model usage records, assistant messages, reasoning and turn context alongside the desktop activity format.
 - Local task reads advance from the last complete record and retain only lifecycle state in memory. Cold-start reads and large updates remain bounded to 256 KiB.
 - Original observed start times and pending questions survive log-window rollover. Truncated/replaced logs reset the previous state; incomplete records are retried after the remaining bytes arrive.
 - Completion and cancellation still clear work, unrelated chats cannot claim its turn, and expired activity does not keep the notch open.
 - Replaying the affected VS Code session now reports Working before completion and Idle after completion.
-- Verification: 210 automated tests passed, including 19 VS Code and incremental-reader regression cases.
+- Verification: 210 automated tests passed, including 19 VS Code and incremental-reader regression cases. Native render checks cover the attached shoulders at compact, expanded and settings-preview sizes, plus opening, closing and rapid reopening.
 
 ## Microsoft Store 1.0.3
 

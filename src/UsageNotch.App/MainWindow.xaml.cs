@@ -230,7 +230,7 @@ public partial class MainWindow : Window
         if (CompactHeader is null || ActivityHeader is null) return;
         CompactHeader.Width = Math.Max(0, Surface.SurfaceWidth - 36);
         ActivityHeader.Width = Math.Max(0, Surface.SurfaceWidth - 48);
-        _platform.SetInteractionBounds(Surface.SurfaceBounds);
+        _platform.SetInteractionBounds(Surface.SurfaceBounds, Surface.Clip);
     }
 
     private void AnimateSurface(DependencyProperty property, double target, int milliseconds)
