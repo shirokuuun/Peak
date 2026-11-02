@@ -4,9 +4,31 @@ Name new versioned build folders `Peak-<version>` (for example, `Peak-1.0.3`). R
 
 Development and Microsoft Store versions advance independently. The development version is in the app project; the Store upload version is in `store/AppxManifest.xml`. A Store build uses the Store version in its executable, assemblies, About view and MSIX package, while including all current development changes.
 
-## Microsoft Store 1.0.3
+## Microsoft Store 1.0.4
 
 Not yet released on Microsoft Store.
+
+- Next upload after Store 1.0.3; package version `1.0.4.0`, including development 1.0.6.
+- Fixes running Codex tasks in VS Code appearing only as recent activity.
+- Recovers work from turn-tagged model records, supports legacy assistant activity, and keeps lifecycle state as large outputs move the recent log window forward.
+- Handles partial writes, completion, cancellation, pending questions and stale observations without retaining prompts, outputs or token totals.
+- Upload package: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`.
+- Verification: all 209 automated tests passed in both development and Store configurations, including replay coverage for the affected VS Code format.
+
+## Development 1.0.6
+
+Not yet released on Microsoft Store.
+
+- VS Code task detection supports its model usage records, assistant messages, reasoning and turn context alongside the desktop activity format.
+- Local task reads advance from the last complete record and retain only lifecycle state in memory. Cold-start reads and large updates remain bounded to 256 KiB.
+- Original observed start times and pending questions survive log-window rollover. Truncated/replaced logs reset the previous state; incomplete records are retried after the remaining bytes arrive.
+- Completion and cancellation still clear work, unrelated chats cannot claim its turn, and expired activity does not keep the notch open.
+- Replaying the affected VS Code session now reports Working before completion and Idle after completion.
+- Verification: 209 automated tests passed, including 18 VS Code and incremental-reader regression cases.
+
+## Microsoft Store 1.0.3
+
+Prepared October 28, 2026. Store package 1.0.3.0 was observed installed on November 2, 2026.
 
 - Next upload after Microsoft Store 1.0.2; package version `1.0.3.0`.
 - Includes all development changes through 1.0.5: resolved approval alerts, hover fading, VS Code activity detection, Inter typography, supplied provider images, borderless transitions, and both notch styles.
