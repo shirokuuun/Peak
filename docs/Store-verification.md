@@ -1,5 +1,27 @@
 # Peak Store candidate verification
 
+## Current 1.0.4 candidate
+
+Checked November 2, 2026 (Asia/Manila).
+
+Not yet released on Microsoft Store. Partner Center shows version 1.0.3, so the next upload is 1.0.4.0. This rebuilt candidate includes all current development 1.0.6 features, including curved screen attachment and the VS Code activity fix. Source commit: `dacf63a`.
+
+Candidate: `Peak-1.0.4.0-Windows-x64-Store.msix`, 119,315,873 bytes.
+
+SHA-256: `ac8b92a616618adc5caacd2796d8a3f4d103367a7669535287b7d8776e8239a7`
+
+- Store configuration passed all 210 tests without skips. Native 1.0.4 previews passed the compact, expanded and settings shoulder checks and opening/closing/rapid-reopening checks.
+- All eight Store project binaries report product version 1.0.4. Core reports Store flavor and assembly version 1.0.4.0, with identical app and bridge bytes. Development stays at 1.0.6.
+- MakeAppx semantically validated the package and MakePri validated its scaled assets. The finished manifest has the expected identity, publisher, x64 architecture and 1.0.4.0 version.
+- All 700 payload files match their staging bytes, with nine license files and no personal settings, credentials, observation logs, debug symbols or signing keys. Package metadata and checksum sidecar match the final SHA-256.
+- The original Store 1.0.3 package retains its checksum. The earlier local 1.0.4 candidate was archived with verified identical bytes before replacement. The mistaken local 1.0.5 candidate was archived and removed from the upload directory.
+- Default packaging still refuses to overwrite an existing candidate. The explicit `-ReplaceUnsubmitted` option archives a candidate before rebuilding the same version, after confirming it has not been uploaded. A local build no longer requires advancing the Store release number.
+- Corrected version notes and packaging changes passed source scans before the GitHub push. The running development app and real provider configuration were not changed.
+
+Upload artifact: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`. Store build folder: `dist/store/Peak-1.0.4`.
+
+This candidate has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit and clean-machine install/update/uninstall and live-provider checks were not repeated.
+
 ## Withdrawn local 1.0.5 candidate
 
 Checked November 2, 2026 (Asia/Manila).
@@ -18,7 +40,7 @@ SHA-256: `fc655431c8ce573db82e0043635275f410a9fd6abdb9c2de0e293e94ae30975b`
 - All 700 payload files match their staging bytes, including nine license files. No personal settings, credentials, observation logs, debug symbols or signing keys are included. The package is unsigned, and its checksum matches both its metadata and sidecar.
 - The earlier 1.0.4.0 package retains its original checksum. Source scans reported no secret findings before the GitHub push. The running development app and real provider configuration were not changed.
 
-Upload artifact: `artifacts/store/Peak-1.0.5.0-Windows-x64-Store.msix`. Store build folder: `dist/store/Peak-1.0.5`.
+Historical filename: `Peak-1.0.5.0-Windows-x64-Store.msix`. Archived locally and removed from the upload directory. Do not use this withdrawn candidate; use the current 1.0.4 package above.
 
 This package has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit, clean-machine installation/update/uninstall, and interactive provider sign-in/notification/startup checks were not repeated for this candidate.
 
@@ -41,7 +63,7 @@ SHA-256: `410f318bca0777693c3b200096dfb39560b84ff567f59d94c6e05c9239f6c99f`
 - All 700 payload files match their staging bytes. Nine license files include Inter's license. No personal settings, credentials, observation logs, debug symbols or signing keys are included. The unsigned package checksum matches its metadata and sidecar. The previous 1.0.3.0 package remains unchanged.
 - Staged source scans reported no secret findings. The installed Store app and real provider configuration were left unchanged.
 
-Upload artifact: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`. Store build folder: `dist/store/Peak-1.0.4`. Development build folder: `dist/Peak-1.0.6`.
+Historical filename: `Peak-1.0.4.0-Windows-x64-Store.msix`. These older bytes were archived before the current 1.0.4 candidate was rebuilt. The current package and checksum are recorded above.
 
 This package has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit, clean-machine installation/update/uninstall, and interactive provider sign-in/notification/startup checks were not repeated for this candidate. The installed Store app receives the fix after 1.0.4 is published.
 

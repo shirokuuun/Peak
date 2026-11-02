@@ -18,6 +18,7 @@ Not yet released on Microsoft Store.
 - Upload package: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`.
 - Verification: all 210 automated tests passed in both development and Store configurations, including replay coverage for the affected VS Code format.
 - Windows SDK package validation passed; all 700 payload files match their staging build. See [Store verification](Store-verification.md).
+- Rebuilt at the same unsubmitted version to include all latest features. The earlier local 1.0.4 and mistaken 1.0.5 files were archived; only the corrected 1.0.4 is the next upload candidate.
 
 ## Withdrawn local 1.0.5 candidate
 
