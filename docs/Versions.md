@@ -15,6 +15,7 @@ Not yet released on Microsoft Store.
 - Retains Dynamic Island, borderless transitions, configurable hover fading, Inter typography and the supplied provider images.
 - Upload package: `artifacts/store/Peak-1.0.5.0-Windows-x64-Store.msix`.
 - Verification: 210 Store-configuration tests passed, plus native render checks for compact, expanded and settings-preview shoulders and opening/closing transitions.
+- Windows SDK package validation passed; all 700 payload files match the staging build. See [Store verification](Store-verification.md).
 
 ## Microsoft Store 1.0.4
 

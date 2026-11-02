@@ -1,5 +1,27 @@
 # Peak Store candidate verification
 
+## 1.0.5
+
+Checked November 2, 2026 (Asia/Manila).
+
+Not yet released on Microsoft Store. Includes the latest development 1.0.6 features, including curved screen attachment and the VS Code activity fix. Source commit: `e608458fee5881f1d03e3d3f50936f7607be5060`.
+
+Candidate: `Peak-1.0.5.0-Windows-x64-Store.msix`, 119,315,850 bytes.
+
+SHA-256: `fc655431c8ce573db82e0043635275f410a9fd6abdb9c2de0e293e94ae30975b`
+
+- Store configuration passed all 210 automated tests without skips. The self-contained Store publication completed without warnings or errors.
+- Native Store-flavor previews confirmed the concave shoulders at compact, expanded and settings-preview sizes. The body widths remain 360, 600 and 220 DIPs, with the outward curves contained in their hosts. Opening, closing, rapid reopening and the gap control checks passed.
+- The README now includes a features overview and a sample-data image of the attached notch. Store listing feature bullets, What's new, version history and upload instructions include the latest appearance and task-detection changes.
+- All eight app/bridge project binaries report product version 1.0.5. The published Core assembly reports Store flavor and assembly version 1.0.5.0; app and bridge Core bytes match. Development remains 1.0.6.
+- MakeAppx semantically validated the manifest, and MakePri validated the scaled image resource index. The finished package's identity, publisher, x64 architecture and 1.0.5.0 version match the Store configuration.
+- All 700 payload files match their staging bytes, including nine license files. No personal settings, credentials, observation logs, debug symbols or signing keys are included. The package is unsigned, and its checksum matches both its metadata and sidecar.
+- The earlier 1.0.4.0 package retains its original checksum. Source scans reported no secret findings before the GitHub push. The running development app and real provider configuration were not changed.
+
+Upload artifact: `artifacts/store/Peak-1.0.5.0-Windows-x64-Store.msix`. Store build folder: `dist/store/Peak-1.0.5`.
+
+This package has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit, clean-machine installation/update/uninstall, and interactive provider sign-in/notification/startup checks were not repeated for this candidate.
+
 ## 1.0.4
 
 Checked November 2, 2026 (Asia/Manila).
