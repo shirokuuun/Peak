@@ -13,7 +13,7 @@ Not yet released on Microsoft Store.
 - Recovers work from turn-tagged model records, supports legacy assistant activity, and keeps lifecycle state as large outputs move the recent log window forward.
 - Handles partial writes, completion, cancellation, pending questions and stale observations without retaining prompts, outputs or token totals.
 - Upload package: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`.
-- Verification: all 209 automated tests passed in both development and Store configurations, including replay coverage for the affected VS Code format.
+- Verification: all 210 automated tests passed in both development and Store configurations, including replay coverage for the affected VS Code format.
 
 ## Development 1.0.6
 
@@ -24,7 +24,7 @@ Not yet released on Microsoft Store.
 - Original observed start times and pending questions survive log-window rollover. Truncated/replaced logs reset the previous state; incomplete records are retried after the remaining bytes arrive.
 - Completion and cancellation still clear work, unrelated chats cannot claim its turn, and expired activity does not keep the notch open.
 - Replaying the affected VS Code session now reports Working before completion and Idle after completion.
-- Verification: 209 automated tests passed, including 18 VS Code and incremental-reader regression cases.
+- Verification: 210 automated tests passed, including 19 VS Code and incremental-reader regression cases.
 
 ## Microsoft Store 1.0.3
 

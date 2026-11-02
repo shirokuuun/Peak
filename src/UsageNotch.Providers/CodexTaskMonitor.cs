@@ -35,7 +35,7 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
     private readonly FileSystemWatcher _watcher;
     private readonly FileSystemWatcher? _sessionWatcher;
     private readonly Dictionary<string, (long Size, DateTime Mtime, string[] Lines)> _tails = new(StringComparer.OrdinalIgnoreCase);
-    private sealed record LocalTail(long Size, DateTime Mtime, DateTime Created, long Offset, LocalTaskState State);
+    private sealed record LocalTail(long Size, DateTime Mtime, DateTime Created, long Offset, byte[] BoundaryHash, LocalTaskState State);
     private readonly Dictionary<string, LocalTail> _localTails = new(StringComparer.OrdinalIgnoreCase);
     private IReadOnlyList<CodexTaskMetadata> _metadata = [];
     private DateTimeOffset _catalogAt = DateTimeOffset.MinValue;
@@ -232,6 +232,13 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
             var size = stream.Length;
             var append = cached is not null && cached.Created == file.CreationTimeUtc && size >= cached.Size &&
                 (size > cached.Size || cached.Mtime == file.LastWriteTimeUtc);
+            if (append)
+            {
+                // A file can be rewritten to a larger size between polls. Compare a
+                // fingerprint at the previous boundary before reusing its lifecycle state.
+                var boundary = await BoundaryHashAsync(stream, cached!.Offset, cancellationToken).ConfigureAwait(false);
+                append = cached.BoundaryHash.AsSpan().SequenceEqual(boundary);
+            }
             var state = append ? cached!.State : new LocalTaskState(id);
             var previousOffset = append ? cached!.Offset : 0;
             var offset = Math.Max(previousOffset, size - 256 * 1024);
@@ -251,11 +258,20 @@ public sealed class CodexTaskMonitor : ICodexTaskMonitor
                     state.Apply(ParseLocalEvent(line), now);
             // Keep the offset before a partial record and reread it when its final bytes arrive.
             var nextOffset = lastNewline >= 0 ? offset + lastNewline + 1 : skipFirst ? size : offset;
-            _localTails[file.FullName] = new(size, file.LastWriteTimeUtc, file.CreationTimeUtc, nextOffset, state);
+            var boundaryHash = await BoundaryHashAsync(stream, nextOffset, cancellationToken).ConfigureAwait(false);
+            _localTails[file.FullName] = new(size, file.LastWriteTimeUtc, file.CreationTimeUtc, nextOffset, boundaryHash, state);
             return state.Snapshot(title, project, now);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         { return cached?.State.Snapshot(title, project, now); }
+    }
+
+    private static async Task<byte[]> BoundaryHashAsync(FileStream stream, long offset, CancellationToken cancellationToken)
+    {
+        var bytes = new byte[(int)Math.Min(64, offset)];
+        stream.Seek(offset - bytes.Length, SeekOrigin.Begin);
+        await stream.ReadExactlyAsync(bytes, cancellationToken).ConfigureAwait(false);
+        return SHA256.HashData(bytes);
     }
 
     private async Task<string[]> TailAsync(FileInfo file, HashSet<string> readPaths, CancellationToken cancellationToken)

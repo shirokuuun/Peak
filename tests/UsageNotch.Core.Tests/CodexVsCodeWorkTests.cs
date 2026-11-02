@@ -198,6 +198,20 @@ public sealed class CodexVsCodeWorkTests
         Assert.Equal(stale, Assert.Single((await monitor.ReadAsync(default)).Tasks));
     }
 
+    [Fact]
+    public async Task RewrittenLargerLogDiscardsThePreviousTurnCheckpoint()
+    {
+        using var fixture = new LogFixture();
+        await fixture.Append(Usage(0));
+        await using var monitor = fixture.Monitor();
+        Assert.Equal(CodexTaskState.Working, Assert.Single((await monitor.ReadAsync(default)).Tasks).State);
+        var replacement = Record("response_item", 1, new { type = "message", role = "user", content = new string('x', 1000) });
+        await File.WriteAllTextAsync(fixture.Path, fixture.Current(replacement) + "\n" + fixture.Current(Event("task_complete", 2, "turn2")) + "\n");
+        var finished = Assert.Single((await monitor.ReadAsync(default)).Tasks);
+        Assert.Equal(CodexTaskState.Idle, finished.State);
+        Assert.Null(finished.StartedAt);
+    }
+
     private sealed class LogFixture : IDisposable
     {
         private readonly string _root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "UsageNotch.Tests", Guid.NewGuid().ToString("N"));
