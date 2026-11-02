@@ -2,11 +2,22 @@
 
 A local Windows 10/11 overlay for personal AI subscription usage and Codex task activity. Built with C#/.NET 10 and WPF. No application database, remote usage backend, or telemetry. Peak is freeware with no activation, account or expiry. A rounded island rests at 360 × 42 DIPs, then smoothly stretches to 600 × 78 for confirmed work or attention requests. The expanded view uses inner information cards, remaining-usage bars, and a compact task activity footer inside one continuous outer shape. Dark, Light, System, and Custom themes are available. The custom Notch icon is embedded in the executable and used by its windows and system tray. The supplied Codex and Claude images identify the notch's usage rings; provider names remain available in tooltips and limits cards.
 
+## Features
+
+- **Two appearances:** a floating Dynamic Island or a Fixed Notch with curved shoulders that join the screen's top edge.
+- **Subscription limits at a glance:** reported Codex and Claude 5-hour and weekly readings, remaining-usage bars, reset countdowns and freshness labels.
+- **Codex task activity:** ongoing work from the desktop app and VS Code, observed requests for attention, completion and interruption states.
+- **Smooth opening and hover behavior:** continuous expansion, fading details, click-to-pin, configurable visibility and pointer fading.
+- **A personal look:** bundled Inter typography, supplied provider images, and Dark, Light, System or Custom colors.
+- **Local controls:** optional notifications, a reveal shortcut, provider consent and privacy settings. Peak is free and has no telemetry.
+
+![Fixed Notch with curved screen attachment — sample data](docs/images/Peak-1.0.6.png)
+
 ## Run
 
 Version 1.0.6 fixes ongoing Codex activity detection in VS Code, including long tasks whose start is outside the recent log window. Its Fixed Notch appearance has curved shoulders that join the top screen edge. Peak bundles Inter with bold headings and usage figures, semibold task text, and medium-weight body text. No font installation is needed.
 
-Development and Microsoft Store versions advance independently. The prepared Store upload is **1.0.4** (package **1.0.4.0**), containing the VS Code fix from development **1.0.6** at the source snapshot recorded in [Store verification](docs/Store-verification.md). The curved screen attachment was added to development 1.0.6 afterward. Not yet released on Microsoft Store. See [version history](docs/Versions.md) and [Store submission](docs/Store-submission.md) for the package and rebuild instructions.
+Development and Microsoft Store versions advance independently. The prepared Store upload is **1.0.5** (package **1.0.5.0**), including development **1.0.6** with the VS Code activity fix and curved screen attachment. Not yet released on Microsoft Store. See [version history](docs/Versions.md), [Store verification](docs/Store-verification.md) and [Store submission](docs/Store-submission.md) for the package and rebuild instructions.
 
 Double-click **Launch Peak.cmd** or `dist/Peak/Peak.exe`. The published build includes its .NET runtime. Windows 10 version 2004 or later and Windows 11, x64, are supported by this build.
 

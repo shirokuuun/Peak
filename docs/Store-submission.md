@@ -12,9 +12,9 @@ Package publisher: `CN=1A8E4068-1357-4BD8-8811-797CDAFAA54F`
 
 Open the current draft → Packages and upload:
 
-`D:\Languages\codex\notch\artifacts\store\Peak-1.0.4.0-Windows-x64-Store.msix`
+`D:\Languages\codex\notch\artifacts\store\Peak-1.0.5.0-Windows-x64-Store.msix`
 
-Version **1.0.4** is the next Store update after **1.0.3** and includes the **development 1.0.6** VS Code fix at the source snapshot in [Store verification](Store-verification.md). The later curved screen-attachment refinement is currently part of development 1.0.6 only. Not yet released on Microsoft Store. The Store and development version numbers advance independently.
+Version **1.0.5** includes the latest **development 1.0.6** features: the curved screen attachment and the VS Code activity fix. The earlier 1.0.4 upload package is preserved. Not yet released on Microsoft Store. The Store and development version numbers advance independently; see [Store verification](Store-verification.md) for the exact source snapshot.
 
 This x64 package includes the runtime, Claude/task bridge, policy bundle 1.1, licenses, Start-menu assets, notification registration and an optional Windows startup task. It starts with providers and startup disabled. It is intentionally unsigned for Partner Center ingestion. Microsoft signs Store-distributed MSIX packages after certification. Do not offer this unsigned upload as a public website download.
 
@@ -40,7 +40,7 @@ Peak puts AI subscription usage and Codex task activity in a compact Windows not
 
 See reported 5-hour and weekly usage windows, reset countdowns and the freshness of your last reading. Follow Codex task activity and observed requests for attention, with details kept in the provider itself. Missing or stale readings remain clearly labeled rather than being shown as zero usage.
 
-Choose when Peak stays visible, adjust its appearance, keep it out of the way in fullscreen, and bring it back with a tray menu or keyboard shortcut. Optional usage and task alerts help you notice the updates you select.
+Choose a floating Dynamic Island or a Fixed Notch with curved shoulders joined to the screen's top edge. Both open smoothly without an outer outline. Customize the color, choose when Peak stays visible, keep it out of the way in fullscreen, and bring it back with a tray menu or keyboard shortcut. Optional usage and task alerts help you notice the updates you select.
 
 Connection setup checks your installed Windows CLIs and reuses compatible existing logins. If a CLI is missing, Peak offers its official installer; provider sign-in happens in the provider's own terminal or browser. Codex hook observations require your separate review and trust in Codex. Peak never approves tools or runs model prompts on your behalf.
 
@@ -61,6 +61,7 @@ Keep AI subscription limits and Codex task activity in view with a compact Windo
 - Reported Codex and Claude subscription usage windows and reset countdowns
 - Codex task activity with observed attention states and freshness indicators
 - Guided Windows CLI connection setup and an automatic Claude usage bridge
+- Dynamic Island or a Fixed Notch with curved screen attachment and smooth opening
 - Configurable appearance, visibility, fullscreen behavior and reveal shortcut
 - Optional usage, reset and Codex task notifications
 - Local observations, explicit provider consent and protected restoration information
@@ -72,7 +73,7 @@ AI usage; usage limits; Codex; Claude Code; desktop utility; subscription monito
 
 ### What's new
 
-Fixed ongoing Codex work in VS Code appearing as recent activity. Long tasks remain visible as their logs grow, and task monitoring handles partial log writes while preserving completion, cancellation and pending-question states.
+Fixed Notch now curves into the screen's top edge, with matching expanded and settings previews. Transparent space around the curves lets clicks pass through. Includes improved detection of ongoing Codex work in VS Code, including long tasks and partial log writes, while preserving completion, cancellation and pending-question states.
 
 ### Listing graphics
 
@@ -109,8 +110,8 @@ Reference: [Microsoft Store policies](https://learn.microsoft.com/en-us/windows/
 ## Rebuild
 
 ```powershell
-./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/store/Peak-1.0.4
-./scripts/package-store.ps1 -Published dist/store/Peak-1.0.4
+./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/store/Peak-1.0.5
+./scripts/package-store.ps1 -Published dist/store/Peak-1.0.5
 ```
 
 The development version remains in `src/UsageNotch.App/UsageNotch.App.csproj`. Increment the independent Store version in `store/AppxManifest.xml` for the next submission, keeping its fourth component zero. `publish.ps1 -StoreBuild` applies that version to the complete Store build, including the bridge. `package-store.ps1` rejects a mismatched publication. The output marker and package metadata record which development version supplied its changes.

@@ -4,6 +4,18 @@ Name new versioned build folders `Peak-<version>` (for example, `Peak-1.0.3`). R
 
 Development and Microsoft Store versions advance independently. The development version is in the app project; the Store upload version is in `store/AppxManifest.xml`. A Store build uses the Store version in its executable, assemblies, About view and MSIX package, while including all current development changes.
 
+## Microsoft Store 1.0.5
+
+Not yet released on Microsoft Store.
+
+- Package version `1.0.5.0`, containing the latest development 1.0.6 features. The earlier 1.0.4 upload package is preserved.
+- Fixed Notch has curved shoulders that join the top screen edge in compact, expanded and Appearance-preview views, while keeping the original content width.
+- Transparent space around the curves passes clicks through, and opening still uses a stable host window.
+- Includes the VS Code activity fix, long-task recovery, partial-write handling, pending questions and completion/cancellation safeguards.
+- Retains Dynamic Island, borderless transitions, configurable hover fading, Inter typography and the supplied provider images.
+- Upload package: `artifacts/store/Peak-1.0.5.0-Windows-x64-Store.msix`.
+- Verification: 210 Store-configuration tests passed, plus native render checks for compact, expanded and settings-preview shoulders and opening/closing transitions.
+
 ## Microsoft Store 1.0.4
 
 Not yet released on Microsoft Store.
@@ -22,7 +34,7 @@ Not yet released on Microsoft Store.
 
 - Fixed Notch now has outward-curving shoulders that merge into the screen's top edge, including its expanded view and Appearance preview. The content area keeps its original width.
 - Transparent space around the curved edges lets clicks pass through. The opening animation still uses a stable host window.
-- This appearance refinement was added after the Store 1.0.4 candidate was built; the existing Store package is the earlier source snapshot recorded in its verification notes.
+- This appearance refinement was added after the Store 1.0.4 candidate was built and is included in the Store 1.0.5 candidate.
 - VS Code task detection supports its model usage records, assistant messages, reasoning and turn context alongside the desktop activity format.
 - Local task reads advance from the last complete record and retain only lifecycle state in memory. Cold-start reads and large updates remain bounded to 256 KiB.
 - Original observed start times and pending questions survive log-window rollover. Truncated/replaced logs reset the previous state; incomplete records are retried after the remaining bytes arrive.

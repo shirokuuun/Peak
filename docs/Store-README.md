@@ -1,6 +1,6 @@
 # Peak — Microsoft Store edition
 
-Choose **Settings → Appearance → Notch style** for a floating **Dynamic Island** or a **Fixed Notch** joined to the screen's top edge. Both open smoothly with no outer outline. Peak includes Inter typography and provider images; no font installation is needed.
+Choose **Settings → Appearance → Notch style** for a floating **Dynamic Island** or a **Fixed Notch** whose curved shoulders join the screen's top edge. Both open smoothly with no outer outline. Peak includes Inter typography and provider images; no font installation is needed.
 
 Publisher: neorangel · Support: peakforwindows.support@gmail.com
 
