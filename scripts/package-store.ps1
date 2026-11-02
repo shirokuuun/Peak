@@ -1,7 +1,8 @@
 param(
     [string]$Published = (Join-Path $PSScriptRoot '../dist/Peak-Store'),
     [string]$MakeAppx,
-    [string]$MakePri
+    [string]$MakePri,
+    [switch]$ReplaceUnsubmitted
 )
 $ErrorActionPreference = 'Stop'
 $peakRoot = Split-Path -Parent $PSScriptRoot
@@ -30,7 +31,8 @@ if (-not $MakePri) { $MakePri = Join-Path (Split-Path -Parent $MakeAppx) 'makepr
 if (-not (Test-Path -LiteralPath $MakePri -PathType Leaf)) { throw 'Windows SDK MakePri.exe is required for the scaled Store assets.' }
 $peakVersion = (Get-Item -LiteralPath (Join-Path $peakPublished 'Peak.exe')).VersionInfo.ProductVersion.Split('+')[0]
 if ($peakVersion -notmatch '^(\d+)\.(\d+)\.(\d+)$') { throw 'A semantic application version is required.' }
-# The Store reserves the fourth component; increment the third for subsequent submissions.
+# Choose the next version from the version actually uploaded/published in Store.
+# Merely rebuilding a local candidate does not advance the Store release number.
 $peakPackageVersion = "$peakVersion.0"
 [xml]$peakManifest = Get-Content -LiteralPath (Join-Path $peakRoot 'store/AppxManifest.xml') -Raw
 if ($peakManifest.Package.Identity.Version -ne $peakPackageVersion -or $peakFlavor.version -ne $peakVersion) {
@@ -39,7 +41,38 @@ if ($peakManifest.Package.Identity.Version -ne $peakPackageVersion -or $peakFlav
 $peakOutput = Join-Path $peakRoot 'artifacts/store'
 New-Item -ItemType Directory -Force -Path $peakOutput | Out-Null
 $peakPackage = Join-Path $peakOutput "Peak-$peakPackageVersion-Windows-x64-Store.msix"
-if (Test-Path -LiteralPath $peakPackage) { throw 'Preserve existing Store artifacts and increment the version before rebuilding.' }
+if (Test-Path -LiteralPath $peakPackage) {
+    if (-not $ReplaceUnsubmitted) {
+        throw 'A local candidate already exists. If this version has not been uploaded to Store, use -ReplaceUnsubmitted to archive it and rebuild. Advance the version only when required by the actual Store submission history.'
+    }
+    # Use this switch only after confirming that this version has not been uploaded.
+    # Keep the earlier bytes and metadata rather than forcing a new release number.
+    $peakArchive = [IO.Path]::GetFullPath((Join-Path $peakRoot ('.research/previous/' +
+        [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N') + '/Peak-' + $peakVersion)))
+    $peakArchiveBoundary = [IO.Path]::GetFullPath((Join-Path $peakRoot '.research')) + [IO.Path]::DirectorySeparatorChar
+    if (-not $peakArchive.StartsWith($peakArchiveBoundary, [StringComparison]::OrdinalIgnoreCase)) { throw 'Archive must stay in this workspace.' }
+    foreach ($peakPath in @($peakArchive, $peakOutput)) {
+        for ($peakAncestor = $peakPath; $peakAncestor; $peakAncestor = Split-Path -Parent $peakAncestor) {
+            if ((Test-Path -LiteralPath $peakAncestor) -and ((Get-Item -LiteralPath $peakAncestor).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Archive or package path contains a linked folder.' }
+        }
+    }
+    $peakOldFiles = @($peakPackage, ($peakPackage + '.sha256'), [IO.Path]::ChangeExtension($peakPackage, '.json'))
+    foreach ($peakOldFile in $peakOldFiles) {
+        if ((Test-Path -LiteralPath $peakOldFile) -and ((Get-Item -LiteralPath $peakOldFile).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Cannot archive a linked package file.' }
+    }
+    New-Item -ItemType Directory -Path $peakArchive -Force | Out-Null
+    foreach ($peakOldFile in $peakOldFiles) {
+        if (Test-Path -LiteralPath $peakOldFile) {
+            $peakSavedFile = Join-Path $peakArchive ([IO.Path]::GetFileName($peakOldFile))
+            Copy-Item -LiteralPath $peakOldFile -Destination $peakSavedFile
+            if ((Get-FileHash -LiteralPath $peakOldFile).Hash -ne (Get-FileHash -LiteralPath $peakSavedFile).Hash) { throw 'Archived package bytes do not match.' }
+        }
+    }
+    foreach ($peakOldFile in $peakOldFiles) {
+        if (Test-Path -LiteralPath $peakOldFile) { Remove-Item -LiteralPath $peakOldFile }
+    }
+    Write-Output "Previous unsubmitted candidate archived: $peakArchive"
+}
 $peakStage = Join-Path $peakRoot ('.research/store-staging-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $peakStage | Out-Null
 Copy-Item -Path (Join-Path $peakPublished '*') -Destination $peakStage -Recurse

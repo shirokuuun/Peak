@@ -12,9 +12,9 @@ Package publisher: `CN=1A8E4068-1357-4BD8-8811-797CDAFAA54F`
 
 Open the current draft → Packages and upload:
 
-`D:\Languages\codex\notch\artifacts\store\Peak-1.0.5.0-Windows-x64-Store.msix`
+`D:\Languages\codex\notch\artifacts\store\Peak-1.0.4.0-Windows-x64-Store.msix`
 
-Version **1.0.5** includes the latest **development 1.0.6** features: the curved screen attachment and the VS Code activity fix. The earlier 1.0.4 upload package is preserved. Not yet released on Microsoft Store. The Store and development version numbers advance independently; see [Store verification](Store-verification.md) for the exact source snapshot.
+Microsoft Store is at **1.0.3**, as confirmed in Partner Center. The next submission is **1.0.4**, including all current **development 1.0.6** features: curved screen attachment and the VS Code activity fix. The local 1.0.5 candidate was a numbering mistake and is withdrawn. Not yet released on Microsoft Store. The Store and development version numbers advance independently; see [Store verification](Store-verification.md) for the exact source snapshot.
 
 This x64 package includes the runtime, Claude/task bridge, policy bundle 1.1, licenses, Start-menu assets, notification registration and an optional Windows startup task. It starts with providers and startup disabled. It is intentionally unsigned for Partner Center ingestion. Microsoft signs Store-distributed MSIX packages after certification. Do not offer this unsigned upload as a public website download.
 
@@ -110,10 +110,12 @@ Reference: [Microsoft Store policies](https://learn.microsoft.com/en-us/windows/
 ## Rebuild
 
 ```powershell
-./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/store/Peak-1.0.5
-./scripts/package-store.ps1 -Published dist/store/Peak-1.0.5
+./scripts/publish.ps1 -PublicRelease -StoreBuild -OutputDirectory dist/store/Peak-1.0.4
+./scripts/package-store.ps1 -Published dist/store/Peak-1.0.4
 ```
 
-The development version remains in `src/UsageNotch.App/UsageNotch.App.csproj`. Increment the independent Store version in `store/AppxManifest.xml` for the next submission, keeping its fourth component zero. `publish.ps1 -StoreBuild` applies that version to the complete Store build, including the bridge. `package-store.ps1` rejects a mismatched publication. The output marker and package metadata record which development version supplied its changes.
+The development version remains in `src/UsageNotch.App/UsageNotch.App.csproj`. Choose the next Store version in `store/AppxManifest.xml` from the actual Partner Center submission history, keeping its fourth component zero. Generating a local package does not count as a Store release. If the same version has not been uploaded, rebuild it with `package-store.ps1 -ReplaceUnsubmitted`; the previous candidate is archived automatically. Once a version has been uploaded, advance the version for a new package as required by Partner Center.
+
+`publish.ps1 -StoreBuild` applies the selected version to the complete Store build, including the bridge. `package-store.ps1` rejects a mismatched publication. The output marker and package metadata record which development version supplied its changes.
 
 Generate logo size variants with `./scripts/create-store-assets.ps1` after changing the existing app icon. Preserve published or uploaded artifacts. Website installer and portable packaging deliberately reject Store builds.

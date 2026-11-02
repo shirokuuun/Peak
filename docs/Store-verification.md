@@ -1,10 +1,10 @@
 # Peak Store candidate verification
 
-## 1.0.5
+## Withdrawn local 1.0.5 candidate
 
 Checked November 2, 2026 (Asia/Manila).
 
-Not yet released on Microsoft Store. Includes the latest development 1.0.6 features, including curved screen attachment and the VS Code activity fix. Source commit: `e608458fee5881f1d03e3d3f50936f7607be5060`.
+Withdrawn before upload: this number was chosen from a locally generated candidate rather than the actual Store version. Microsoft Store remains at 1.0.3; use the rebuilt 1.0.4 package described above. This historical local build included the latest development 1.0.6 features. Source commit: `e608458fee5881f1d03e3d3f50936f7607be5060`.
 
 Candidate: `Peak-1.0.5.0-Windows-x64-Store.msix`, 119,315,850 bytes.
 
@@ -22,7 +22,7 @@ Upload artifact: `artifacts/store/Peak-1.0.5.0-Windows-x64-Store.msix`. Store bu
 
 This package has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit, clean-machine installation/update/uninstall, and interactive provider sign-in/notification/startup checks were not repeated for this candidate.
 
-## 1.0.4
+## Previous 1.0.4 local candidate (superseded before upload)
 
 Checked November 2, 2026 (Asia/Manila).
 

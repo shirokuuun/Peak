@@ -17,7 +17,7 @@ A local Windows 10/11 overlay for personal AI subscription usage and Codex task 
 
 Version 1.0.6 fixes ongoing Codex activity detection in VS Code, including long tasks whose start is outside the recent log window. Its Fixed Notch appearance has curved shoulders that join the top screen edge. Peak bundles Inter with bold headings and usage figures, semibold task text, and medium-weight body text. No font installation is needed.
 
-Development and Microsoft Store versions advance independently. The prepared Store upload is **1.0.5** (package **1.0.5.0**), including development **1.0.6** with the VS Code activity fix and curved screen attachment. Not yet released on Microsoft Store. See [version history](docs/Versions.md), [Store verification](docs/Store-verification.md) and [Store submission](docs/Store-submission.md) for the package and rebuild instructions.
+Development and Microsoft Store versions advance independently. Microsoft Store is at **1.0.3**, so the next upload is **1.0.4** (package **1.0.4.0**), including all current development **1.0.6** features. Locally generated or rebuilt packages do not advance the Store version. Not yet released on Microsoft Store. See [version history](docs/Versions.md), [Store verification](docs/Store-verification.md) and [Store submission](docs/Store-submission.md) for the package and rebuild instructions.
 
 Double-click **Launch Peak.cmd** or `dist/Peak/Peak.exe`. The published build includes its .NET runtime. Windows 10 version 2004 or later and Windows 11, x64, are supported by this build.
 
