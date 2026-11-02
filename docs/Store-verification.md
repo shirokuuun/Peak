@@ -1,5 +1,28 @@
 # Peak Store candidate verification
 
+## 1.0.4
+
+Checked November 2, 2026 (Asia/Manila).
+
+Not yet released on Microsoft Store. Includes development 1.0.6 and follows the installed Store 1.0.3.0 package. Source commit: `d6ba9de27cbe0d354f316e89199c45e415d00460`.
+
+Candidate: `Peak-1.0.4.0-Windows-x64-Store.msix`, 119,315,437 bytes.
+
+SHA-256: `410f318bca0777693c3b200096dfb39560b84ff567f59d94c6e05c9239f6c99f`
+
+- Development and Store configurations each passed all 210 tests without skips, including 19 new VS Code and incremental-reader regression cases. The Release build and both self-contained publications completed without warnings or errors.
+- The affected VS Code session was replayed read-only against the published Store binaries. Its bounded log tail now reports Working before completion and Idle after completion; Store 1.0.3 classified the same pre-completion records as RecentActivity. Only synthetic fixtures were committed.
+- Regression checks cover cold-start recovery, preserving the observed start across large output, partial completion records, pending questions and matching answers, stale work, cross-chat/turn isolation, late records after completion/cancellation, and truncated or rewritten logs.
+- The local cache contains lifecycle state and a file-boundary fingerprint, without retaining message bodies, reasoning, tool output, token totals or response identifiers. Both configurations retain the five-minute observation expiry.
+- All eight Store app/bridge project binaries report product version 1.0.4. The Core assembly reports the Store flavor and version 1.0.4.0; app and bridge Core bytes match. The separate development executable reports 1.0.6.
+- MakeAppx packaged and semantically validated the manifest. The finished package's identity, publisher, x64 architecture and 1.0.4.0 version match the Store configuration. MakePri validated the scaled image resource index.
+- All 700 payload files match their staging bytes. Nine license files include Inter's license. No personal settings, credentials, observation logs, debug symbols or signing keys are included. The unsigned package checksum matches its metadata and sidecar. The previous 1.0.3.0 package remains unchanged.
+- Staged source scans reported no secret findings. The installed Store app and real provider configuration were left unchanged.
+
+Upload artifact: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`. Store build folder: `dist/store/Peak-1.0.4`. Development build folder: `dist/Peak-1.0.6`.
+
+This package has not been uploaded, certified or signed by Microsoft. Windows App Certification Kit, clean-machine installation/update/uninstall, and interactive provider sign-in/notification/startup checks were not repeated for this candidate. The installed Store app receives the fix after 1.0.4 is published.
+
 ## 1.0.3
 
 Checked October 28, 2026 (Asia/Manila).

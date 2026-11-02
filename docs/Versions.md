@@ -14,6 +14,7 @@ Not yet released on Microsoft Store.
 - Handles partial writes, completion, cancellation, pending questions and stale observations without retaining prompts, outputs or token totals.
 - Upload package: `artifacts/store/Peak-1.0.4.0-Windows-x64-Store.msix`.
 - Verification: all 210 automated tests passed in both development and Store configurations, including replay coverage for the affected VS Code format.
+- Windows SDK package validation passed; all 700 payload files match their staging build. See [Store verification](Store-verification.md).
 
 ## Development 1.0.6
 
